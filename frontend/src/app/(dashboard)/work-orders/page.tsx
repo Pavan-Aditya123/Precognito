@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { mockAssetDocumentation, mockAuditTrail, mockWorkOrders } from "@/lib/mockData";
+import { useEffect, useState } from "react";
+import { mockAssetDocumentation, mockAuditTrail } from "@/lib/mockData";
 import { DocumentationPanel } from "@/components/dashboard/DocumentationPanel";
 import { QRScanner } from "@/components/dashboard/QRScanner";
 import { AuditTrailTable } from "@/components/dashboard/AuditTrailTable";
@@ -45,7 +45,7 @@ export default function WorkOrdersPage() {
           <span className="text-[#94a3b8]">
             Active Orders:{" "}
             <span className="text-[#f1f5f9]">
-              {mockWorkOrders.filter((wo) => wo.status !== "COMPLETED").length}
+              {workOrders.filter((wo) => wo.status !== "COMPLETED").length}
             </span>
           </span>
         </div>
