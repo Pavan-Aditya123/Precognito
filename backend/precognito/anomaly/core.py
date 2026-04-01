@@ -1,6 +1,18 @@
 """
 Consolidated core anomaly detection engine
 Combines pattern detection, ML model, and batch processing
+
+Features:
+- ML-based anomaly detection using Isolation Forest
+- Pattern-based spike detection using Z-score analysis
+- Threshold-based fallback detection
+- Hybrid result combination for maximum accuracy
+- Batch processing for multiple sensor readings
+- REST API integration via FastAPI
+
+Author: Pavan Aditya
+Version: 1.0
+Date: April 2026
 """
 
 import json
@@ -13,11 +25,15 @@ from collections import defaultdict, deque
 from pathlib import Path
 
 # Configuration
+# These are the sensor ranges used for threshold-based detection
+# and fallback when ML model is unavailable
 SENSOR_CONFIG = {
-    "temperature": {"min": 290.0, "max": 310.0, "critical": 330.0},
-    "vibration": {"min": 0.1, "max": 2.0, "critical": 3.0},
+    "temperature": {"min": 295.0, "max": 305.0, "critical": 310.0},
+    "vibration": {"min": 1000.0, "max": 2000.0, "critical": 2500.0}, 
     "torque": {"min": 20.0, "max": 60.0, "critical": 80.0}
 }
+
+# Severity thresholds for anomaly classification
 SEVERITY_THRESHOLDS = {"LOW": 0.1, "MODERATE": 0.25, "HIGH": 0.5, "CRITICAL": 0.75}
 
 # Setup logging
@@ -86,7 +102,15 @@ class PatternDetector:
         return result
 
 class AnomalyDetector:
-    """Unified anomaly detection with pattern analysis and ML"""
+    """
+    Unified anomaly detection with pattern analysis and ML
+    
+    This class combines pattern-based spike detection with ML-based anomaly detection
+    using a trained Isolation Forest model.
+    
+    Args:
+        window_size: Number of data points to keep in history (default: 10)
+    """
     
     def __init__(self, window_size: int = 10):
         self.pattern_detector = PatternDetector(window_size)
