@@ -66,16 +66,16 @@ export function AssetDetailHeader({ asset }: AssetDetailHeaderProps) {
         <div className="bg-[#0f172a] rounded-lg p-4">
           <p className="text-xs text-[#94a3b8] mb-1">Last Updated</p>
           <p className="text-lg font-medium text-[#f1f5f9]">
-            {new Date(asset.lastUpdated).toLocaleTimeString("en-US", { 
+            {asset.lastUpdated ? new Date(asset.lastUpdated).toLocaleTimeString("en-US", { 
               hour: "2-digit", 
               minute: "2-digit" 
-            })}
+            }) : "Never"}
           </p>
           <p className="text-xs text-[#64748b] mt-1">
-            {new Date(asset.lastUpdated).toLocaleDateString("en-US", { 
+            {asset.lastUpdated ? new Date(asset.lastUpdated).toLocaleDateString("en-US", { 
               month: "short", 
               day: "numeric" 
-            })}
+            }) : "-"}
           </p>
         </div>
       </div>

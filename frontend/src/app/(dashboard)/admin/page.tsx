@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { UserRole, roleColors } from "@/lib/authContext";
+import { useState, useEffect } from "react";
+import { UserRole, roleColors } from "@/lib/constants";
+import { api } from "@/lib/api";
 
 interface User {
   id: string;
@@ -31,9 +32,22 @@ const roles: { value: UserRole; label: string }[] = [
 
 export default function AdminPage() {
   const [users, setUsers] = useState<User[]>(initialUsers);
+  const [auditLogs, setAuditLogs] = useState<any[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [newUser, setNewUser] = useState({ name: "", email: "", role: "TECHNICIAN" as UserRole });
+
+  useEffect(() => {
+    async function loadAuditLogs() {
+      try {
+        const logs = await api.getAuditLogs();
+        setAuditLogs(logs);
+      } catch (err) {
+        console.error("Failed to load audit logs", err);
+      }
+    }
+    loadAuditLogs();
+  }, []);
 
   const handleAddUser = () => {
     if (!newUser.name || !newUser.email) return;
@@ -62,73 +76,113 @@ export default function AdminPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold text-[#f1f5f9]">User Management</h1>
-        <button
-          onClick={() => setShowAddModal(true)}
-          className="px-4 py-2 bg-[#3b82f6] text-white text-sm rounded-lg hover:bg-[#2563eb] transition-colors"
-        >
-          Add User
-        </button>
-      </div>
+    <div className="space-y-8">
+      <section className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h1 className="text-xl font-semibold text-[#f1f5f9]">User Management</h1>
+          <button
+            onClick={() => setShowAddModal(true)}
+            className="px-4 py-2 bg-[#3b82f6] text-white text-sm rounded-lg hover:bg-[#2563eb] transition-colors"
+          >
+            Add User
+          </button>
+        </div>
 
-      <div className="border border-[#334155] rounded-lg overflow-hidden">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-[#334155] bg-[#1e293b]">
-              <th className="px-4 py-3 text-left text-[#94a3b8] font-medium">Name</th>
-              <th className="px-4 py-3 text-left text-[#94a3b8] font-medium">Email</th>
-              <th className="px-4 py-3 text-left text-[#94a3b8] font-medium">Role</th>
-              <th className="px-4 py-3 text-left text-[#94a3b8] font-medium">Status</th>
-              <th className="px-4 py-3 text-left text-[#94a3b8] font-medium">Last Active</th>
-              <th className="px-4 py-3 text-right text-[#94a3b8] font-medium">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map((user) => (
-              <tr key={user.id} className="border-b border-[#334155] hover:bg-[#1e293b] transition-colors">
-                <td className="px-4 py-3 text-[#f1f5f9]">{user.name}</td>
-                <td className="px-4 py-3 text-[#94a3b8]">{user.email}</td>
-                <td className="px-4 py-3">
-                  <span
-                    className="inline-block px-2 py-0.5 rounded text-xs text-white"
-                    style={{ backgroundColor: roleColors[user.role] }}
-                  >
-                    {user.role.replace(/_/g, " ")}
-                  </span>
-                </td>
-                <td className="px-4 py-3">
-                  <span
-                    className={`inline-block px-2 py-0.5 rounded text-xs ${
-                      user.status === "ACTIVE" ? "bg-[#22c55e]/20 text-[#22c55e]" : "bg-[#94a3b8]/20 text-[#94a3b8]"
-                    }`}
-                  >
-                    {user.status}
-                  </span>
-                </td>
-                <td className="px-4 py-3 text-[#94a3b8]">
-                  {new Date(user.lastActive).toLocaleString()}
-                </td>
-                <td className="px-4 py-3 text-right">
-                  <button
-                    onClick={() => setEditingUser(user)}
-                    className="text-[#3b82f6] hover:underline mr-3"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDeleteUser(user.id)}
-                    className="text-[#ef4444] hover:underline"
-                  >
-                    Delete
-                  </button>
-                </td>
+        <div className="border border-[#334155] rounded-lg overflow-hidden">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-[#334155] bg-[#1e293b]">
+                <th className="px-4 py-3 text-left text-[#94a3b8] font-medium">Name</th>
+                <th className="px-4 py-3 text-left text-[#94a3b8] font-medium">Email</th>
+                <th className="px-4 py-3 text-left text-[#94a3b8] font-medium">Role</th>
+                <th className="px-4 py-3 text-left text-[#94a3b8] font-medium">Status</th>
+                <th className="px-4 py-3 text-left text-[#94a3b8] font-medium">Last Active</th>
+                <th className="px-4 py-3 text-right text-[#94a3b8] font-medium">Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {users.map((user) => (
+                <tr key={user.id} className="border-b border-[#334155] hover:bg-[#1e293b] transition-colors">
+                  <td className="px-4 py-3 text-[#f1f5f9]">{user.name}</td>
+                  <td className="px-4 py-3 text-[#94a3b8]">{user.email}</td>
+                  <td className="px-4 py-3">
+                    <span
+                      className="inline-block px-2 py-0.5 rounded text-xs text-white"
+                      style={{ backgroundColor: roleColors[user.role] }}
+                    >
+                      {user.role.replace(/_/g, " ")}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <span
+                      className={`inline-block px-2 py-0.5 rounded text-xs ${
+                        user.status === "ACTIVE" ? "bg-[#22c55e]/20 text-[#22c55e]" : "bg-[#94a3b8]/20 text-[#94a3b8]"
+                      }`}
+                    >
+                      {user.status}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-[#94a3b8]">
+                    {new Date(user.lastActive).toLocaleString()}
+                  </td>
+                  <td className="px-4 py-3 text-right">
+                    <button
+                      onClick={() => setEditingUser(user)}
+                      className="text-[#3b82f6] hover:underline mr-3"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDeleteUser(user.id)}
+                      className="text-[#ef4444] hover:underline"
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section className="space-y-4">
+        <h2 className="text-lg font-medium text-[#f1f5f9]">Recent Audit Trail</h2>
+        <div className="border border-[#334155] rounded-lg overflow-hidden">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-[#334155] bg-[#1e293b]">
+                <th className="px-4 py-3 text-left text-[#94a3b8] font-medium">Timestamp</th>
+                <th className="px-4 py-3 text-left text-[#94a3b8] font-medium">User</th>
+                <th className="px-4 py-3 text-left text-[#94a3b8] font-medium">Action</th>
+                <th className="px-4 py-3 text-left text-[#94a3b8] font-medium">Resource</th>
+                <th className="px-4 py-3 text-left text-[#94a3b8] font-medium">Details</th>
+              </tr>
+            </thead>
+            <tbody>
+              {auditLogs.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="px-4 py-8 text-center text-[#64748b]">No audit logs recorded yet.</td>
+                </tr>
+              ) : (
+                auditLogs.map((log) => (
+                  <tr key={log.id} className="border-b border-[#334155] hover:bg-[#1e293b] transition-colors">
+                    <td className="px-4 py-3 text-[#94a3b8]">{new Date(log.timestamp).toLocaleString()}</td>
+                    <td className="px-4 py-3 text-[#f1f5f9]">{log.userName}</td>
+                    <td className="px-4 py-3">
+                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#334155] text-[#f1f5f9]">
+                        {log.action}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-[#94a3b8]">{log.resource}</td>
+                    <td className="px-4 py-3 text-xs text-[#64748b]">{log.details}</td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </section>
 
       {showAddModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80">

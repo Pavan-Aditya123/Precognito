@@ -2,7 +2,7 @@
 Test simplified anomaly detection system
 """
 
-from core import detect_anomaly, process_file
+from precognito.anomaly.core import detect_anomaly, process_file
 import json
 
 def test_single_detection():
@@ -33,9 +33,15 @@ def test_batch_processing():
     """Test batch processing"""
     print("\nTesting Batch Processing:")
     print("="*40)
-    
+
     # Process existing file
-    summary = process_file("input_data.json", "simplified")
+    import os
+    from pathlib import Path
+    import precognito.anomaly as anomaly
+    base_path = Path(anomaly.__file__).parent
+    json_path = base_path / "input_data.json"
+    summary = process_file(json_path, "simplified")
+
     print(f"Summary: {summary['anomalies_detected']}/{summary['total_records']} anomalies")
 
 if __name__ == "__main__":

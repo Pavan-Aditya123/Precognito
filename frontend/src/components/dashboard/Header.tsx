@@ -1,24 +1,53 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useAuth, roleColors } from "@/lib/authContext";
-import { mockThermalAlerts } from "@/lib/mockData";
+import { useSession, signOut } from "@/lib/auth-client";
+import { api } from "@/lib/api";
+
+export const roleColors: Record<string, string> = {
+  ADMIN: "#ef4444",
+  MANAGER: "#8b5cf6",
+  OT_SPECIALIST: "#3b82f6",
+  TECHNICIAN: "#22c55e",
+  STORE_MANAGER: "#eab308",
+};
 
 export function Header() {
-  const { user, logout } = useAuth();
+  const { data: session } = useSession();
+  const user = session?.user;
   const router = useRouter();
   const [showDropdown, setShowDropdown] = useState(false);
+  const [alerts, setAlerts] = useState<any[]>([]);
 
-  const unacknowledgedAlerts = mockThermalAlerts.filter((a) => !a.acknowledged).length;
+  useEffect(() => {
+    async function loadAlerts() {
+      try {
+        const data = await api.getAlerts();
+        setAlerts(data);
+      } catch (err) {
+        console.error("Failed to load alerts", err);
+      }
+    }
 
-  const handleLogout = () => {
-    logout();
+    if (user) {
+      loadAlerts();
+      const interval = setInterval(loadAlerts, 15000); // Check for alerts every 15s
+      return () => clearInterval(interval);
+    }
+  }, [user]);
+
+  const handleLogout = async () => {
+    await signOut();
     router.push("/login");
   };
 
   if (!user) return null;
+
+  // @ts-ignore
+  const role = user.role || "TECHNICIAN";
+  const unacknowledgedCount = alerts.length;
 
   return (
     <header
@@ -32,9 +61,9 @@ export function Header() {
       </div>
 
       <div className="flex items-center gap-4">
-        {unacknowledgedAlerts > 0 && (
+        {unacknowledgedCount > 0 && (
           <Link
-            href="/ehs"
+            href="/alerts"
             className="relative p-2 text-[#94a3b8] hover:text-[#f1f5f9] transition-colors"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -46,7 +75,7 @@ export function Header() {
               />
             </svg>
             <span className="absolute -top-1 -right-1 w-4 h-4 flex items-center justify-center bg-[#ef4444] text-white text-[10px] font-bold rounded-full">
-              {unacknowledgedAlerts}
+              {unacknowledgedCount}
             </span>
           </Link>
         )}
@@ -56,12 +85,12 @@ export function Header() {
             onClick={() => setShowDropdown(!showDropdown)}
             className="flex items-center gap-2 p-2 rounded-lg hover:bg-[#1e293b] transition-colors"
           >
-            <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium" style={{ backgroundColor: roleColors[user.role] }}>
+            <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium" style={{ backgroundColor: roleColors[role] || "#3b82f6" }}>
               {user.name.charAt(0).toUpperCase()}
             </div>
             <div className="text-left hidden sm:block">
               <p className="text-sm text-[#f1f5f9]">{user.name}</p>
-              <p className="text-xs text-[#94a3b8]">{user.role.replace(/_/g, " ")}</p>
+              <p className="text-xs text-[#94a3b8]">{role.replace(/_/g, " ")}</p>
             </div>
             <svg className="w-4 h-4 text-[#94a3b8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />

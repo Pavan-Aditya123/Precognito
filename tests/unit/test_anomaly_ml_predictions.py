@@ -3,17 +3,21 @@ Test ML anomaly detection with real predictions
 """
 
 import pandas as pd
-from core import detect_anomaly
+from precognito.anomaly.core import detect_anomaly
 import json
 
 def test_on_dataset_samples():
     """Test ML model on samples from the actual dataset"""
     print("Testing ML Model on Dataset Samples")
     print("=" * 50)
-    
+
     # Load dataset
-    df = pd.read_csv('predictive_maintenance.csv')
-    
+    import os
+    from pathlib import Path
+    import precognito.anomaly as anomaly
+    base_path = Path(anomaly.__file__).parent
+    csv_path = base_path / 'predictive_maintenance.csv'
+    df = pd.read_csv(csv_path)
     # Test on some normal samples
     normal_samples = df[df['Target'] == 0].head(5)
     print("\nTesting NORMAL samples (should be non-anomalous):")

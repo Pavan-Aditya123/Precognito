@@ -125,21 +125,22 @@ class AnomalyDetector:
         """Load trained model and scaler"""
         try:
             import pickle
-            model_path = Path("anomaly_model.pkl")
-            scaler_path = Path("scaler.pkl")
+            base_path = Path(__file__).parent
+            model_path = base_path / "anomaly_model.pkl"
+            scaler_path = base_path / "scaler.pkl"
             
             if model_path.exists() and scaler_path.exists():
                 self.model = pickle.load(open(model_path, 'rb'))
                 self.scaler = pickle.load(open(scaler_path, 'rb'))
                 
                 # Load feature names
-                feature_names_path = Path("feature_names.json")
+                feature_names_path = base_path / "feature_names.json"
                 if feature_names_path.exists():
                     with open(feature_names_path, 'r') as f:
                         self.feature_names = json.load(f)
                 
                 # Load feature stats
-                stats_path = Path("feature_stats.json")
+                stats_path = base_path / "feature_stats.json"
                 if stats_path.exists():
                     with open(stats_path, 'r') as f:
                         self.feature_stats = json.load(f)
@@ -147,7 +148,7 @@ class AnomalyDetector:
                 self.initialized = True
                 logger.info("ML model loaded successfully")
             else:
-                logger.warning("Model files not found, using fallback detection")
+                logger.warning(f"Model files not found at {model_path}, using fallback detection")
         except Exception as e:
             logger.error(f"Failed to load model: {e}")
     
@@ -217,7 +218,8 @@ class AnomalyDetector:
             # Load label encoder if available
             try:
                 import pickle
-                with open('label_encoder.pkl', 'rb') as f:
+                base_path = Path(__file__).parent
+                with open(base_path / 'label_encoder.pkl', 'rb') as f:
                     label_encoder = pickle.load(f)
                 df_features['Type_encoded'] = label_encoder.transform(df_features['Type'])
                 df_features = df_features.drop('Type', axis=1)

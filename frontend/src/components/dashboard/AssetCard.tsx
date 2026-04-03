@@ -36,7 +36,7 @@ export function AssetCard({ asset }: AssetCardProps) {
       </div>
 
       <p className="mt-3 text-xs text-[#94a3b8]">
-        Updated {new Date(asset.lastUpdated).toLocaleString()}
+        {asset.lastUpdated ? `Updated ${new Date(asset.lastUpdated).toLocaleString()}` : "No data yet"}
       </p>
     </Link>
   );

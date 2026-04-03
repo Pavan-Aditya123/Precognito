@@ -2,7 +2,7 @@
 Test the fixed API with proper anomaly detection
 """
 
-from core import detect_anomaly
+from precognito.anomaly.core import detect_anomaly, get_detector
 import json
 
 def test_fixed_anomaly_detection():
@@ -121,7 +121,6 @@ def test_batch_anomalies():
         ]
     }
     
-    from core import get_detector
     detector = get_detector()
     results = detector.detect_batch([item for item in batch_data["data"]])
     

@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useAuth, rolePermissions } from "@/lib/authContext";
+import { useSession } from "@/lib/auth-client";
+import { rolePermissions, UserRole } from "@/lib/constants";
 
 const allNavItems = [
   { href: "/dashboard", label: "Dashboard" },
@@ -20,16 +21,16 @@ const allNavItems = [
 
 export function Sidebar() {
   const pathname = usePathname();
-  const { user, isLoggedIn } = useAuth();
+  const { data: session } = useSession();
+  const user = session?.user;
 
-  const allowedPages = user ? rolePermissions[user.role] : [];
+  // @ts-ignore - custom role field
+  const role = user?.role || "TECHNICIAN";
+  const allowedPages = rolePermissions[role] || [];
+  
   const navItems = allNavItems.filter(
     (item) => item.href === "/dashboard" || allowedPages.includes(item.href.slice(1))
   );
-
-  if (!isLoggedIn) {
-    return null;
-  }
 
   return (
     <aside

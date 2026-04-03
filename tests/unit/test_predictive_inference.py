@@ -1,18 +1,5 @@
-import os
-import sys
-
-# Test setup
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import pytest
-from ml.data_generator import generate_telemetry_data
-from ml.train import train_models
-from ml.inference_engine import PredictiveInferenceEngine
-
-# Generate data and models once before testing
-@pytest.fixture(scope="module", autouse=True)
-def setup_models():
-    generate_telemetry_data(num_machines=10, max_cycles=200)
-    train_models()
+from precognito.predictive.predictive_engine import PredictiveInferenceEngine
 
 def test_tc_m3_01_rul_estimation():
     # TC_M3_01: Input valid degradation telemetry -> calculate & display RUL

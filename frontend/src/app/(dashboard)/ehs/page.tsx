@@ -1,13 +1,36 @@
 "use client";
 
-import { useState } from "react";
-import { mockThermalAlerts, mockTemperatureTrends, mockAssets } from "@/lib/mockData";
+import { useState, useEffect } from "react";
+import { mockTemperatureTrends, mockAssets } from "@/lib/mockData";
 import { ThermalAlertCard } from "@/components/dashboard/ThermalAlertCard";
 import { ThermalTrendChart } from "@/components/dashboard/ThermalTrendChart";
-import { ThermalAlert } from "@/lib/types";
+import { ThermalAlert, Asset } from "@/lib/types";
+import { api } from "@/lib/api";
 
 export default function EHSPage() {
-  const [alerts, setAlerts] = useState<ThermalAlert[]>(mockThermalAlerts);
+  const [alerts, setAlerts] = useState<ThermalAlert[]>([]);
+  const [assets, setAssets] = useState<Asset[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadEHSData() {
+      try {
+        const [alertsData, assetsData] = await Promise.all([
+          api.getSafetyAlerts(),
+          api.getAssets()
+        ]);
+        setAlerts(alertsData);
+        setAssets(assetsData);
+      } catch (err) {
+        console.error("Failed to load EHS data", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadEHSData();
+    const interval = setInterval(loadEHSData, 15000);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleAcknowledge = (alertId: string) => {
     setAlerts((prev) =>
@@ -24,12 +47,20 @@ export default function EHSPage() {
     );
   };
 
+  if (loading && alerts.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="text-[#94a3b8]">Loading safety data...</div>
+      </div>
+    );
+  }
+
   const unacknowledgedAlerts = alerts.filter((a) => !a.acknowledged);
   const acknowledgedAlerts = alerts.filter((a) => a.acknowledged);
   const criticalCount = unacknowledgedAlerts.filter((a) => a.severity === "CRITICAL").length;
   const warningCount = unacknowledgedAlerts.filter((a) => a.severity === "WARNING").length;
 
-  const assetsWithTrends = mockAssets.slice(0, 4);
+  const assetsWithTrends = assets.slice(0, 4);
 
   return (
     <div className="space-y-6">
@@ -84,7 +115,7 @@ export default function EHSPage() {
       {unacknowledgedAlerts.length > 0 && (
         <section>
           <h2 className="text-lg font-medium text-[#f1f5f9] mb-3">
-            Unacknowledged Alerts ({unacknowledgedAlerts.length})
+            Unacknowledged Safety Alerts ({unacknowledgedAlerts.length})
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {unacknowledgedAlerts.map((alert) => (
@@ -100,21 +131,27 @@ export default function EHSPage() {
 
       <section>
         <h2 className="text-lg font-medium text-[#f1f5f9] mb-3">
-          Temperature Trends
+          Active Thermal Trends
         </h2>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          {assetsWithTrends.map((asset) => {
-            const alert = alerts.find((a) => a.assetId === asset.id);
-            return (
-              <ThermalTrendChart
-                key={asset.id}
-                data={mockTemperatureTrends[asset.id] || []}
-                assetName={asset.name}
-                baselineTemp={alert?.baselineTemp || 60}
-                criticalTemp={70}
-              />
-            );
-          })}
+          {assetsWithTrends.length === 0 ? (
+            <div className="col-span-2 text-center py-10 border border-dashed border-[#334155] rounded-lg">
+              <p className="text-[#64748b]">No asset data available for trend analysis.</p>
+            </div>
+          ) : (
+            assetsWithTrends.map((asset) => {
+              const alert = alerts.find((a) => a.assetId === asset.id);
+              return (
+                <ThermalTrendChart
+                  key={asset.id}
+                  data={mockTemperatureTrends[asset.id] || []}
+                  assetName={asset.name}
+                  baselineTemp={alert?.baselineTemp || 60}
+                  criticalTemp={70}
+                />
+              );
+            })
+          )}
         </div>
       </section>
 
@@ -136,7 +173,7 @@ export default function EHSPage() {
       )}
 
       <section className="border border-[#334155] rounded-lg p-6 bg-[#1e293b]">
-        <h3 className="text-sm font-medium text-[#94a3b8] mb-4">Alert Statistics</h3>
+        <h3 className="text-sm font-medium text-[#94a3b8] mb-4">Safety Statistics</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="p-4 rounded-lg bg-[#0f172a]">
             <p className="text-xs text-[#94a3b8] mb-1">Total Alerts</p>
