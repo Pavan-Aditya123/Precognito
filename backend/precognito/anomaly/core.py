@@ -1,14 +1,6 @@
 """
-Consolidated core anomaly detection engine
-Combines pattern detection, ML model, and batch processing
-
-Features:
-- ML-based anomaly detection using Isolation Forest
-- Pattern-based spike detection using Z-score analysis
-- Threshold-based fallback detection
-- Hybrid result combination for maximum accuracy
-- Batch processing for multiple sensor readings
-- REST API integration via FastAPI
+Consolidated core anomaly detection engine.
+Combines pattern detection, ML model, and threshold-based fallback.
 
 Author: Pavan Aditya
 Version: 1.0
@@ -41,17 +33,47 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class PatternDetector:
+    """Detects spikes and patterns in sensor telemetry using statistical analysis.
+
+    Attributes:
+        window_size (int): Number of historical points to keep for moving statistics.
+        spike_threshold (float): Z-score threshold for spike detection.
+        history (defaultdict): Nested dictionary storing historical data per machine and sensor.
+    """
+
     def __init__(self, window_size: int = 10, spike_threshold: float = 1.5):
+        """Initializes the PatternDetector.
+
+        Args:
+            window_size (int, optional): Moving window size. Defaults to 10.
+            spike_threshold (float, optional): Z-score threshold. Defaults to 1.5.
+        """
         self.window_size = window_size
         self.spike_threshold = spike_threshold
         self.history = defaultdict(lambda: defaultdict(lambda: deque(maxlen=window_size)))
 
     def add_record(self, machine_id: str, data: Dict):
+        """Adds a new sensor reading to the machine's history.
+
+        Args:
+            machine_id (str): Unique identifier of the machine.
+            data (Dict): Sensor telemetry data.
+        """
         for sensor, value in data.items():
             if sensor in SENSOR_CONFIG and value is not None:
                 self.history[machine_id][sensor].append(float(value))
 
     def detect_spike(self, machine_id: str, sensor: str, current_value: float) -> Tuple[bool, float, str]:
+        """Detects if a single sensor reading is a statistical spike.
+
+        Args:
+            machine_id (str): Unique identifier of the machine.
+            sensor (str): The name of the sensor.
+            current_value (float): The current reading.
+
+        Returns:
+            Tuple[bool, float, str]: A tuple of (is_spike, z_score, reason).
+        """
         if sensor not in self.history[machine_id] or len(self.history[machine_id][sensor]) < 3:
             return False, 0.0, "Insufficient data"
         
@@ -69,6 +91,15 @@ class PatternDetector:
         return is_spike, z_score, reason
 
     def detect_pattern_anomaly(self, machine_id: str, data: Dict):
+        """Analyzes a set of sensor readings for pattern-based anomalies.
+
+        Args:
+            machine_id (str): Unique identifier of the machine.
+            data (Dict): Current sensor telemetry data.
+
+        Returns:
+            dict: Anomaly analysis results containing detection status, severity, and confidence.
+        """
         result = {
             "anomaly_detected": False,
             "anomaly_types": [],
@@ -102,17 +133,24 @@ class PatternDetector:
         return result
 
 class AnomalyDetector:
-    """
-    Unified anomaly detection with pattern analysis and ML
+    """Unified anomaly detection engine combining pattern analysis and ML models.
     
-    This class combines pattern-based spike detection with ML-based anomaly detection
-    using a trained Isolation Forest model.
+    This class orchestrates both statistical pattern-based detection and 
+    ML-based (Isolation Forest) detection.
     
-    Args:
-        window_size: Number of data points to keep in history (default: 10)
+    Attributes:
+        pattern_detector (PatternDetector): Instance for statistical analysis.
+        model: Loaded Isolation Forest model or None.
+        scaler: Loaded MinMaxScaler or None.
+        initialized (bool): Whether the ML components were successfully loaded.
     """
     
     def __init__(self, window_size: int = 10):
+        """Initializes the AnomalyDetector and loads ML models if available.
+
+        Args:
+            window_size (int, optional): History window size for pattern detection. Defaults to 10.
+        """
         self.pattern_detector = PatternDetector(window_size)
         self.model = None
         self.scaler = None
@@ -122,7 +160,7 @@ class AnomalyDetector:
         self._load_model()
     
     def _load_model(self):
-        """Load trained model and scaler"""
+        """Loads trained Isolation Forest model, scaler, and metadata from disk."""
         try:
             import pickle
             base_path = Path(__file__).parent
@@ -153,7 +191,16 @@ class AnomalyDetector:
             logger.error(f"Failed to load model: {e}")
     
     def detect_anomaly(self, data: Dict, timestamp: str = None) -> Dict:
-        """Main anomaly detection method"""
+        """Main entry point for detecting anomalies in sensor data.
+
+        Args:
+            data (Dict): Dictionary of sensor readings, must include 'machine_id'.
+            timestamp (str, optional): ISO format timestamp. Defaults to current time.
+
+        Returns:
+            Dict: Comprehensive detection results including anomaly status, severity, 
+                  confidence, metrics, and detailed analysis from both ML and pattern engines.
+        """
         if not self.initialized:
             return self._error_response(data, timestamp, "Detector not initialized")
         
@@ -192,7 +239,14 @@ class AnomalyDetector:
             return self._error_response(data, timestamp, f"Detection failed: {str(e)}")
     
     def _detect_ml_anomaly(self, data: Dict) -> Dict:
-        """ML-based anomaly detection using trained model"""
+        """Runs the Isolation Forest model to detect anomalies.
+
+        Args:
+            data (Dict): Mapped sensor features.
+
+        Returns:
+            Dict: ML-specific detection results.
+        """
         try:
             if self.model is None or self.scaler is None:
                 # Fallback to threshold-based detection
@@ -244,7 +298,6 @@ class AnomalyDetector:
             is_anomaly = prediction == -1
             
             # Calculate confidence based on anomaly score
-            # More aggressive threshold for anomaly detection
             confidence = abs(anomaly_score)
             
             # Only flag as anomaly if score is significantly negative OR extreme values
@@ -273,7 +326,14 @@ class AnomalyDetector:
             return self._threshold_detection(data)
     
     def _threshold_detection(self, data: Dict) -> Dict:
-        """Fallback threshold-based detection"""
+        """Detects anomalies by comparing readings to absolute SENSOR_CONFIG limits.
+
+        Args:
+            data (Dict): Current sensor telemetry.
+
+        Returns:
+            Dict: Threshold-based detection results.
+        """
         anomaly_detected = False
         anomaly_types = []
         confidence = 0.0
@@ -302,7 +362,16 @@ class AnomalyDetector:
         }
     
     def _calculate_severity(self, pattern_result: Dict, ml_result: Dict, final_anomaly: bool) -> str:
-        """Calculate combined severity"""
+        """Determines the combined severity level based on multiple detection results.
+
+        Args:
+            pattern_result (Dict): Results from PatternDetector.
+            ml_result (Dict): Results from ML model.
+            final_anomaly (bool): Whether any engine flagged an anomaly.
+
+        Returns:
+            str: Severity level ("LOW", "MODERATE", "HIGH", or "CRITICAL").
+        """
         if not final_anomaly:
             return "LOW"
         
@@ -317,7 +386,15 @@ class AnomalyDetector:
             return ml_sev
     
     def _combine_reasons(self, pattern_result: Dict, ml_result: Dict) -> str:
-        """Combine detection reasons"""
+        """Aggregates explanation strings from all detection engines.
+
+        Args:
+            pattern_result (Dict): Results from PatternDetector.
+            ml_result (Dict): Results from ML model.
+
+        Returns:
+            str: Combined reason string.
+        """
         reasons = []
         if pattern_result["anomaly_detected"]:
             reasons.append(pattern_result["reason"])
@@ -326,7 +403,16 @@ class AnomalyDetector:
         return "; ".join(reasons) if reasons else "No anomalies detected"
     
     def _error_response(self, data: Dict, timestamp: str, error: str) -> Dict:
-        """Create error response"""
+        """Constructs a fallback response when detection logic fails.
+
+        Args:
+            data (Dict): Input data.
+            timestamp (str): ISO timestamp.
+            error (str): Error message.
+
+        Returns:
+            Dict: Error response dictionary.
+        """
         return {
             "machine_id": data.get("machine_id", "unknown"),
             "timestamp": timestamp or datetime.now().isoformat(),
@@ -340,6 +426,14 @@ class AnomalyDetector:
         }
     
     def detect_batch(self, data_list: List[Dict]) -> List[Dict]:
+        """Processes a list of telemetry points sequentially.
+
+        Args:
+            data_list (List[Dict]): List of sensor telemetry dictionaries.
+
+        Returns:
+            List[Dict]: List of detection results.
+        """
         results = []
         for data in data_list:
             result = self.detect_anomaly(data)  # sequential pattern learning
@@ -347,11 +441,25 @@ class AnomalyDetector:
         return results      
     
     def get_history(self, machine_id: str) -> Dict:
-        """Get machine history"""
+        """Retrieves raw history for a specific machine.
+
+        Args:
+            machine_id (str): Unique identifier of the machine.
+
+        Returns:
+            Dict: Historical data per sensor.
+        """
         return {sensor: list(values) for sensor, values in self.pattern_detector.history[machine_id].items()}
     
     def get_statistics(self, machine_id: str) -> Dict:
-        """Get machine statistics"""
+        """Calculates running statistics for a machine's sensors.
+
+        Args:
+            machine_id (str): Unique identifier of the machine.
+
+        Returns:
+            Dict: Statistics (mean, std, min, max, latest) per sensor.
+        """
         stats = {}
         for sensor, values in self.pattern_detector.history[machine_id].items():
             if len(values) > 0:
@@ -370,7 +478,11 @@ class AnomalyDetector:
 _detector = None
 
 def get_detector():
-    """Get global detector instance"""
+    """Retrieves or initializes the global AnomalyDetector singleton.
+
+    Returns:
+        AnomalyDetector: The singleton instance.
+    """
     global _detector
     if _detector is None:
         _detector = AnomalyDetector()
@@ -378,15 +490,37 @@ def get_detector():
 
 # Convenience functions
 def detect_anomaly(data: Dict) -> Dict:
-    """Detect anomaly for single data point"""
+    """Convenience wrapper for single anomaly detection.
+
+    Args:
+        data (Dict): Sensor telemetry.
+
+    Returns:
+        Dict: Detection result.
+    """
     return get_detector().detect_anomaly(data)
 
 def detect_batch(data_list: List[Dict]) -> List[Dict]:
-    """Detect anomalies for batch data"""
+    """Convenience wrapper for batch anomaly detection.
+
+    Args:
+        data_list (List[Dict]): List of sensor telemetry.
+
+    Returns:
+        List[Dict]: List of detection results.
+    """
     return get_detector().detect_batch(data_list)
 
 def process_file(input_file: str, output_prefix: str = "output") -> Dict:
-    """Process input file and generate outputs"""
+    """Processes a JSON file of sensor data and saves detection results to JSON and CSV.
+
+    Args:
+        input_file (str): Path to input JSON file.
+        output_prefix (str, optional): Prefix for output files. Defaults to "output".
+
+    Returns:
+        Dict: Processing summary (total records, anomalies detected, etc.).
+    """
     detector = get_detector()
     
     # Load input

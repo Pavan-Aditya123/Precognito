@@ -1,3 +1,9 @@
+/**
+ * @fileoverview Main landing page for the dashboard area.
+ * This module provides a high-level summary of plant health, recent alerts, 
+ * and quick access to various system modules based on user roles.
+ */
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -8,6 +14,11 @@ import { Asset } from "@/lib/types";
 import Link from "next/link";
 import { rolePermissions, roleColors, UserRole } from "@/lib/constants";
 
+/**
+ * DashboardPage component for general system oversight and navigation.
+ * 
+ * @returns {JSX.Element|null} The rendered dashboard page or null if not authenticated.
+ */
 export default function DashboardPage() {
   const { data: session, isPending } = useSession();
   const [assets, setAssets] = useState<Asset[]>([]);
@@ -16,6 +27,9 @@ export default function DashboardPage() {
   const router = useRouter();
 
   useEffect(() => {
+    /**
+     * Loads high-level dashboard metrics and alerts.
+     */
     async function loadDashboardData() {
       try {
         const [assetsData, alertsData] = await Promise.all([

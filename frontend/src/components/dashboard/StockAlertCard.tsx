@@ -1,3 +1,7 @@
+/**
+ * @file StockAlertCard component for displaying just-in-time (JIT) stock alerts.
+ */
+
 "use client";
 
 import Link from "next/link";
@@ -8,6 +12,13 @@ interface StockAlertCardProps {
   part: SparePart;
 }
 
+/**
+ * Renders an alert card for a spare part with low stock relative to asset RUL.
+ * 
+ * @param {StockAlertCardProps} props The component props.
+ * @param {SparePart} props.part The spare part data.
+ * @returns {JSX.Element} The rendered stock alert card.
+ */
 export function StockAlertCard({ part }: StockAlertCardProps) {
   const asset = part.assetId ? mockAssets.find((a) => a.id === part.assetId) : null;
   const thresholdHours = part.leadTimeDays * 24 * 1.1;

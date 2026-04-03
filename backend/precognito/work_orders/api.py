@@ -1,3 +1,6 @@
+"""
+API router for work orders, combining assets and audit sub-routers.
+"""
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from precognito.work_orders.assets import router as assets_router
@@ -12,6 +15,11 @@ router.include_router(assets_router)
 router.include_router(audit_router)
 
 def get_db():
+    """Dependency to get a SQLAlchemy database session.
+
+    Yields:
+        Session: A database session instance.
+    """
     db = SessionLocal()
     try:
         yield db
@@ -20,7 +28,15 @@ def get_db():
 
 @router.get("/")
 def get_work_orders(db: Session = Depends(get_db)):
-    """Fetch all work orders (audits) from the database with asset metadata"""
+    """Fetches all work orders (audits) from the database with asset metadata.
+
+    Args:
+        db (Session): Database session dependency.
+
+    Returns:
+        list: A list of dictionaries, each representing a work order with 
+              joined asset information (name, MTTR, manual).
+    """
     # Join Audit with Asset to get name and MTTR
     results = db.query(
         models.Audit, 

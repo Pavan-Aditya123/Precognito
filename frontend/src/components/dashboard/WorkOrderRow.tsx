@@ -1,3 +1,7 @@
+/**
+ * @file WorkOrderRow component for displaying an individual work order's details.
+ */
+
 "use client";
 
 import Link from "next/link";
@@ -22,6 +26,13 @@ const statusColors: Record<string, string> = {
   CANCELLED: "text-[#94a3b8] border-[#94a3b8]",
 };
 
+/**
+ * Renders a row (card) for a work order with priority, status, and part availability.
+ * 
+ * @param {WorkOrderRowProps} props The component props.
+ * @param {WorkOrder} props.workOrder The work order data.
+ * @returns {JSX.Element} The rendered work order row.
+ */
 export function WorkOrderRow({ workOrder }: WorkOrderRowProps) {
   const reservedParts = workOrder.requiredParts.map((rp) => {
     const part = getSparePartById(rp.partId);

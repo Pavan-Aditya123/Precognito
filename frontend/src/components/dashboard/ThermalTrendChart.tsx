@@ -1,3 +1,7 @@
+/**
+ * @file ThermalTrendChart component for visualizing asset temperature history.
+ */
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -20,6 +24,16 @@ interface ThermalTrendChartProps {
   criticalTemp?: number;
 }
 
+/**
+ * Renders a line chart showing temperature trends over 24 hours with baseline and critical thresholds.
+ * 
+ * @param {ThermalTrendChartProps} props The component props.
+ * @param {TemperatureTrendPoint[]} props.data Array of temperature data points.
+ * @param {string} props.assetName The name of the asset.
+ * @param {number} props.baselineTemp The normal operating temperature.
+ * @param {number} [props.criticalTemp=70] The critical temperature threshold.
+ * @returns {JSX.Element} The rendered thermal trend chart.
+ */
 export function ThermalTrendChart({
   data,
   assetName,

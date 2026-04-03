@@ -1,3 +1,7 @@
+/**
+ * @file SensorRow component for displaying an individual sensor's status in a table row.
+ */
+
 "use client";
 
 import { SensorStatus } from "@/lib/types";
@@ -12,6 +16,12 @@ const statusConfig: Record<SensorStatus["status"], { color: string; bg: string; 
   OFFLINE: { color: "text-white", bg: "bg-[#ef4444]", label: "Offline" },
 };
 
+/**
+ * Formats a ISO timestamp into a relative time string (e.g., "5 min ago").
+ * 
+ * @param {string} timestamp The ISO timestamp string.
+ * @returns {string} The formatted relative time string.
+ */
 function formatTimeAgo(timestamp: string): string {
   const now = new Date();
   const sensorTime = new Date(timestamp);
@@ -26,12 +36,25 @@ function formatTimeAgo(timestamp: string): string {
   return `${diffDays} day${diffDays > 1 ? "s" : ""} ago`;
 }
 
+/**
+ * Gets the CSS color class based on battery level.
+ * 
+ * @param {number} level The battery level percentage (0-100).
+ * @returns {string} The CSS class for the battery color.
+ */
 function getBatteryColor(level: number): string {
   if (level > 50) return "bg-[#22c55e]";
   if (level > 20) return "bg-[#eab308]";
   return "bg-[#ef4444]";
 }
 
+/**
+ * Renders a table row for a single sensor.
+ * 
+ * @param {SensorRowProps} props The component props.
+ * @param {SensorStatus} props.sensor The sensor data to display.
+ * @returns {JSX.Element} The rendered sensor row.
+ */
 export function SensorRow({ sensor }: SensorRowProps) {
   const config = statusConfig[sensor.status];
 

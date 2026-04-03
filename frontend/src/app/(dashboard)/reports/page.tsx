@@ -1,3 +1,9 @@
+/**
+ * @fileoverview Reports page for generating and downloading asset health reports.
+ * This module provides the user interface for configuring and viewing reports
+ * based on asset telemetry and maintenance data.
+ */
+
 "use client";
 
 import { useState } from "react";
@@ -9,11 +15,28 @@ import { ReportChart } from "@/components/dashboard/ReportChart";
 import { api } from "@/lib/api";
 import { downloadCSV, downloadPDF } from "@/lib/reporting";
 
+/**
+ * ReportsPage component for managing and generating system reports.
+ * 
+ * @returns {JSX.Element} The rendered reports page.
+ */
 export default function ReportsPage() {
   const [reports, setReports] = useState<Report[]>(mockReports);
   const [showChart, setShowChart] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
 
+  /**
+   * Handles the generation of a new report based on user configuration.
+   * 
+   * @param {Object} config The report configuration.
+   * @param {ReportType} config.type The format of the report (e.g., CSV, PDF).
+   * @param {ReportCategory} config.category The category of data to include.
+   * @param {string[]} config.assets The list of asset IDs to include.
+   * @param {Object} config.dateRange The date range for the report.
+   * @param {string} config.dateRange.from The start date.
+   * @param {string} config.dateRange.to The end date.
+   * @returns {Promise<void>}
+   */
   const handleGenerate = async (config: {
     type: ReportType;
     category: ReportCategory;
@@ -41,6 +64,12 @@ export default function ReportsPage() {
     }, 1500);
   };
 
+  /**
+   * Handles downloading a specific report.
+   * 
+   * @param {Report} report The report object to download.
+   * @returns {Promise<void>}
+   */
   const handleDownload = async (report: Report) => {
     let data: any[] = [];
     

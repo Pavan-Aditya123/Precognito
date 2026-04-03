@@ -1,5 +1,16 @@
+/**
+ * @fileoverview Public landing page for the Precognito application.
+ * This module provides the marketing overview, features list, 
+ * and entry points for user authentication.
+ */
+
 import Link from "next/link";
 
+/**
+ * LandingPage component for the application's public entry point.
+ * 
+ * @returns {JSX.Element} The rendered marketing landing page.
+ */
 export default function LandingPage() {
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#0f172a" }}>

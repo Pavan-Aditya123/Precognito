@@ -1,15 +1,27 @@
+/**
+ * @file Alerts page for monitoring real-time alerts from asset monitoring.
+ */
+
 "use client";
 
 import { useState, useEffect } from "react";
 import { AlertList } from "@/components/dashboard/AlertList";
 import { api } from "@/lib/api";
 
+/**
+ * Renders the alerts page with a filterable list of real-time alerts.
+ * 
+ * @returns {JSX.Element} The rendered alerts page.
+ */
 export default function AlertsPage() {
   const [alerts, setAlerts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    /**
+     * Loads the list of alerts from the API.
+     */
     async function loadAlerts() {
       try {
         const data = await api.getAlerts();

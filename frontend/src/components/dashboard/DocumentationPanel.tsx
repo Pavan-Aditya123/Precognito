@@ -1,3 +1,7 @@
+/**
+ * @file DocumentationPanel component for displaying asset-related documents and benchmarks.
+ */
+
 "use client";
 
 import Link from "next/link";
@@ -7,6 +11,13 @@ interface DocumentationPanelProps {
   documentation: AssetDocumentation;
 }
 
+/**
+ * Renders a panel containing links to schematics, manuals, and MTTR benchmarks.
+ * 
+ * @param {DocumentationPanelProps} props The component props.
+ * @param {AssetDocumentation} props.documentation The documentation data object.
+ * @returns {JSX.Element} The rendered documentation panel.
+ */
 export function DocumentationPanel({ documentation }: DocumentationPanelProps) {
   return (
     <div className="space-y-6">

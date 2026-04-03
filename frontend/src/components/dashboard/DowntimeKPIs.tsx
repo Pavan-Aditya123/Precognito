@@ -1,3 +1,7 @@
+/**
+ * @file DowntimeKPIs component for displaying aggregate cost and downtime metrics.
+ */
+
 "use client";
 
 import { CostAnalysis } from "@/lib/types";
@@ -6,6 +10,13 @@ interface DowntimeKPIsProps {
   costAnalysisList: CostAnalysis[];
 }
 
+/**
+ * Renders executive-level KPIs related to downtime costs, risk exposure, and potential savings.
+ * 
+ * @param {DowntimeKPIsProps} props The component props.
+ * @param {CostAnalysis[]} props.costAnalysisList Array of cost analysis data points.
+ * @returns {JSX.Element} The rendered downtime KPIs dashboard.
+ */
 export function DowntimeKPIs({ costAnalysisList }: DowntimeKPIsProps) {
   const totalRiskValue = costAnalysisList.reduce(
     (sum, ca) => sum + ca.riskOfFailurePerHour * ca.potentialDowntimeHours,

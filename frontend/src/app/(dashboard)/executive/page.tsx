@@ -1,3 +1,9 @@
+/**
+ * @fileoverview Executive dashboard page for high-level decision support.
+ * This module provides key performance indicators (KPIs) such as Overall Equipment 
+ * Effectiveness (OEE), risk assessments, and cost-benefit analysis for management.
+ */
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -7,12 +13,20 @@ import { CostComparisonCard } from "@/components/dashboard/CostComparisonCard";
 import { DowntimeKPIs } from "@/components/dashboard/DowntimeKPIs";
 import { api } from "@/lib/api";
 
+/**
+ * ExecutivePage component for high-level plant performance oversight.
+ * 
+ * @returns {JSX.Element} The rendered executive dashboard.
+ */
 export default function ExecutivePage() {
   const [oeeData, setOeeData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const costAnalysis = mockCostAnalysis;
 
   useEffect(() => {
+    /**
+     * Fetches OEE metrics from the API.
+     */
     async function loadOEE() {
       try {
         const data = await api.getOEEMetrics();

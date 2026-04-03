@@ -1,3 +1,7 @@
+/**
+ * @file ThermalAlertCard component for displaying temperature anomalies.
+ */
+
 "use client";
 
 import Link from "next/link";
@@ -8,6 +12,14 @@ interface ThermalAlertCardProps {
   onAcknowledge?: (id: string) => void;
 }
 
+/**
+ * Renders an alert card for a thermal anomaly with temperature details and acknowledgement action.
+ * 
+ * @param {ThermalAlertCardProps} props The component props.
+ * @param {ThermalAlert} props.alert The thermal alert data.
+ * @param {function(string): void} [props.onAcknowledge] Callback to acknowledge the alert.
+ * @returns {JSX.Element} The rendered thermal alert card.
+ */
 export function ThermalAlertCard({ alert, onAcknowledge }: ThermalAlertCardProps) {
   const tempDiff = alert.currentTemp - alert.baselineTemp;
   const isCritical = alert.severity === "CRITICAL";

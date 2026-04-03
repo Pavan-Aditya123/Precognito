@@ -1,3 +1,6 @@
+"""
+MQTT Worker module for ingesting telemetry data from an MQTT broker.
+"""
 import json
 import logging
 import os
@@ -16,6 +19,15 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 def on_connect(client, userdata, flags, rc, properties=None):
+    """Callback triggered when the client connects to the MQTT broker.
+
+    Args:
+        client (paho.mqtt.client.Client): The client instance for this callback.
+        userdata: The private user data as set in Client() or user_data_set().
+        flags (dict): Response flags sent by the broker.
+        rc (int): The connection result.
+        properties (paho.mqtt.packettypes.Properties, optional): MQTT v5.0 properties.
+    """
     if rc == 0:
         logger.info(f"Connected to MQTT Broker at {MQTT_BROKER}:{MQTT_PORT}")
         client.subscribe(MQTT_TOPIC)
@@ -24,6 +36,13 @@ def on_connect(client, userdata, flags, rc, properties=None):
         logger.error(f"Failed to connect, return code {rc}")
 
 def on_message(client, userdata, msg):
+    """Callback triggered when a message is received from the MQTT broker.
+
+    Args:
+        client (paho.mqtt.client.Client): The client instance for this callback.
+        userdata: The private user data as set in Client() or user_data_set().
+        msg (paho.mqtt.client.MQTTMessage): An instance of MQTTMessage.
+    """
     try:
         payload = json.loads(msg.payload.decode())
         topic = msg.topic
@@ -47,6 +66,8 @@ def on_message(client, userdata, msg):
         logger.error(f"Error processing MQTT message: {e}")
 
 def run_worker():
+    """Initializes and runs the MQTT client to listen for incoming telemetry.
+    """
     client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
     client.on_connect = on_connect
     client.on_message = on_message

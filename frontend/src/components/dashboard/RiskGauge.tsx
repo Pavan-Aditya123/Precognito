@@ -1,3 +1,7 @@
+/**
+ * @file RiskGauge component for visualizing failure risk level.
+ */
+
 "use client";
 
 import { CostAnalysis } from "@/lib/types";
@@ -7,10 +11,23 @@ interface RiskGaugeProps {
   costAnalysis: CostAnalysis;
 }
 
+/**
+ * Renders a risk gauge showing the percentage risk of failure and associated hourly cost.
+ * 
+ * @param {RiskGaugeProps} props The component props.
+ * @param {CostAnalysis} props.costAnalysis The cost analysis data containing risk score.
+ * @returns {JSX.Element} The rendered risk gauge.
+ */
 export function RiskGauge({ costAnalysis }: RiskGaugeProps) {
   const maxRisk = 100;
   const percentage = Math.min((costAnalysis.riskScore / maxRisk) * 100, 100);
   
+  /**
+   * Gets the color associated with a risk score.
+   * 
+   * @param {number} score The risk score (0-100).
+   * @returns {string} Hex color string.
+   */
   const getColor = (score: number) => {
     if (score >= 70) return "#ef4444";
     if (score >= 40) return "#eab308";

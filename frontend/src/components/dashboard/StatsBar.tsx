@@ -1,3 +1,7 @@
+/**
+ * @file StatsBar component for displaying high-level asset health statistics.
+ */
+
 interface StatsBarProps {
   total: number;
   healthy: number;
@@ -5,6 +9,16 @@ interface StatsBarProps {
   critical: number;
 }
 
+/**
+ * Displays a row of statistics showing total assets and counts by health status.
+ * 
+ * @param {StatsBarProps} props The component props.
+ * @param {number} props.total Total number of assets.
+ * @param {number} props.healthy Number of healthy assets.
+ * @param {number} props.warning Number of assets with warnings.
+ * @param {number} props.critical Number of critical assets.
+ * @returns {JSX.Element} The rendered statistics bar.
+ */
 export function StatsBar({ total, healthy, warning, critical }: StatsBarProps) {
   return (
     <div className="flex gap-6 mb-6">

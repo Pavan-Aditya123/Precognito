@@ -1,14 +1,28 @@
+/**
+ * @fileoverview Settings page for user preferences and system configuration.
+ * This module allows users to configure notification settings, such as 
+ * NTFY.sh topics and priorities for real-time alerts.
+ */
+
 "use client";
 
 import { useState, useEffect } from "react";
 import { useSession } from "@/lib/auth-client";
 
+/**
+ * SettingsPage component for managing application-wide preferences.
+ * 
+ * @returns {JSX.Element} The rendered settings page.
+ */
 export default function SettingsPage() {
   const { data: session } = useSession();
   const [ntfyTopic, setNtfyTopic] = useState("precognito_alerts_demo");
   const [notificationPriority, setNotificationPriority] = useState("urgent");
   const [saveStatus, setSaveStatus] = useState<string | null>(null);
 
+  /**
+   * Persists settings to local storage.
+   */
   const handleSave = () => {
     // In a real app, we would save this to the user profile in the DB
     localStorage.setItem("ntfy_topic", ntfyTopic);
@@ -18,6 +32,11 @@ export default function SettingsPage() {
     setTimeout(() => setSaveStatus(null), 3000);
   };
 
+  /**
+   * Sends a test notification via NTFY.sh to verify settings.
+   * 
+   * @returns {Promise<void>}
+   */
   const testNotification = async () => {
     try {
       await fetch(`https://ntfy.sh/${ntfyTopic}`, {

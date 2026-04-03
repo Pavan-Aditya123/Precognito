@@ -1,3 +1,7 @@
+/**
+ * @file Edge Status page for monitoring sensor connectivity and heartbeat status.
+ */
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -5,11 +9,19 @@ import { SensorTable } from "@/components/dashboard/SensorTable";
 import { api } from "@/lib/api";
 import { SensorStatus } from "@/lib/types";
 
+/**
+ * Renders the edge status page with a table of sensors and their connectivity state.
+ * 
+ * @returns {JSX.Element} The rendered edge status page.
+ */
 export default function EdgePage() {
   const [sensors, setSensors] = useState<SensorStatus[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    /**
+     * Loads the sensor heartbeat data and maps it to the UI status type.
+     */
     async function loadHeartbeats() {
       try {
         // We'll use fetchWithAuth directly or add a new method to api

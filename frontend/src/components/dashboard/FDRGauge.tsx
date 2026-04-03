@@ -1,3 +1,7 @@
+/**
+ * @file FDRGauge component for visualizing the False Discovery Rate (FDR) of ML models.
+ */
+
 "use client";
 
 import { ModelMetrics } from "@/lib/types";
@@ -6,6 +10,13 @@ interface FDRGaugeProps {
   metrics: ModelMetrics[];
 }
 
+/**
+ * Renders a gauge showing the current FDR compared to industrial targets.
+ * 
+ * @param {FDRGaugeProps} props The component props.
+ * @param {ModelMetrics[]} props.metrics Array of historical model metrics.
+ * @returns {JSX.Element} The rendered FDR gauge.
+ */
 export function FDRGauge({ metrics }: FDRGaugeProps) {
   const latest = metrics[metrics.length - 1];
   const avgFDR = metrics.reduce((sum, m) => sum + m.fdr, 0) / metrics.length;
@@ -14,6 +25,12 @@ export function FDRGauge({ metrics }: FDRGaugeProps) {
   const fdrPercentage = Math.min((latest.fdr / 20) * 100, 100);
   const targetPercentage = (targetFDR / 20) * 100;
   
+  /**
+   * Gets the color based on FDR value.
+   * 
+   * @param {number} fdr The FDR value.
+   * @returns {string} Hex color string.
+   */
   const getColor = (fdr: number) => {
     if (fdr > 10) return "#ef4444";
     if (fdr > targetFDR) return "#eab308";

@@ -1,3 +1,7 @@
+/**
+ * @file PerformanceTrend component for visualizing ML model performance over time.
+ */
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -8,6 +12,13 @@ interface PerformanceTrendProps {
   metrics: ModelMetrics[];
 }
 
+/**
+ * Renders a multi-line chart showing Precision, Recall, and F1 Score trends.
+ * 
+ * @param {PerformanceTrendProps} props The component props.
+ * @param {ModelMetrics[]} props.metrics Array of historical model metrics.
+ * @returns {JSX.Element} The rendered performance trend chart.
+ */
 export function PerformanceTrend({ metrics }: PerformanceTrendProps) {
   const [mounted, setMounted] = useState(false);
 

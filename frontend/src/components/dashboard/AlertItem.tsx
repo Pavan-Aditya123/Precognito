@@ -1,3 +1,7 @@
+/**
+ * @file AlertItem component for displaying individual alert details.
+ */
+
 "use client";
 
 import { Alert } from "@/lib/types";
@@ -13,6 +17,12 @@ const severityConfig: Record<Alert["severity"], { color: string; bg: string; lab
   LOW: { color: "text-white", bg: "bg-[#22c55e]", label: "Low" },
 };
 
+/**
+ * Formats a ISO timestamp into a relative time string (e.g., "5 min ago").
+ * 
+ * @param {string} timestamp The ISO timestamp string.
+ * @returns {string} The formatted relative time string.
+ */
 function formatTimeAgo(timestamp: string): string {
   const now = new Date();
   const alertTime = new Date(timestamp);
@@ -27,6 +37,13 @@ function formatTimeAgo(timestamp: string): string {
   return `${diffDays} day${diffDays > 1 ? "s" : ""} ago`;
 }
 
+/**
+ * Renders an individual alert item with severity styling and asset info.
+ * 
+ * @param {AlertItemProps} props The component props.
+ * @param {Alert} props.alert The alert object to display.
+ * @returns {JSX.Element} The rendered alert item.
+ */
 export function AlertItem({ alert }: AlertItemProps) {
   const config = severityConfig[alert.severity];
 

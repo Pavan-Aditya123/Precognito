@@ -1,3 +1,9 @@
+/**
+ * @fileoverview Layout wrapper for all dashboard-related pages.
+ * Handles user authentication checks, sidebar navigation, header display, 
+ * and offline status indicators.
+ */
+
 "use client";
 
 import { Sidebar } from "@/components/dashboard/Sidebar";
@@ -7,6 +13,13 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { OfflineIndicator } from "@/components/ui/OfflineIndicator";
 
+/**
+ * DashboardLayout component that provides common UI structure for dashboard pages.
+ * 
+ * @param {Object} props Component properties.
+ * @param {React.ReactNode} props.children The page content to be rendered within the layout.
+ * @returns {JSX.Element|null} The rendered dashboard layout or null during redirection.
+ */
 export default function DashboardLayout({
   children,
 }: {
@@ -16,6 +29,9 @@ export default function DashboardLayout({
   const router = useRouter();
 
   useEffect(() => {
+    /**
+     * Redirects to login if the session is not valid.
+     */
     if (!isPending && !session) {
       router.push("/login");
     }

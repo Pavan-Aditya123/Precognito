@@ -1,6 +1,10 @@
+"""
+API router for inventory management and JIT procurement alerts.
+"""
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
+from datetime import datetime
 from precognito.work_orders.database import SessionLocal
 from precognito.inventory import models
 from precognito.ingestion.influx_client import query_latest_data
@@ -8,6 +12,11 @@ from precognito.ingestion.influx_client import query_latest_data
 router = APIRouter(prefix="/inventory", tags=["Inventory"])
 
 def get_db():
+    """Dependency to get a SQLAlchemy database session.
+
+    Yields:
+        Session: A database session instance.
+    """
     db = SessionLocal()
     try:
         yield db
@@ -16,6 +25,14 @@ def get_db():
 
 @router.get("/", response_model=List[dict])
 def get_inventory(db: Session = Depends(get_db)):
+    """Retrieves all inventory items with their current status.
+
+    Args:
+        db (Session): Database session dependency.
+
+    Returns:
+        list: A list of dictionaries containing part details and stock status.
+    """
     items = db.query(models.Inventory).all()
     return [
         {
@@ -33,6 +50,18 @@ def get_inventory(db: Session = Depends(get_db)):
 
 @router.post("/reserve")
 def reserve_part(data: dict, db: Session = Depends(get_db)):
+    """Reserves a specific quantity of a part for a work order.
+
+    Args:
+        data (dict): Dictionary containing partId, quantity, and workOrderId.
+        db (Session): Database session dependency.
+
+    Raises:
+        HTTPException: If stock is insufficient or part is not found.
+
+    Returns:
+        dict: Status and the ID of the created reservation.
+    """
     part_id = data.get("partId")
     quantity = data.get("quantity", 1)
     work_order_id = data.get("workOrderId")
@@ -53,8 +82,17 @@ def reserve_part(data: dict, db: Session = Depends(get_db)):
 
 @router.post("/purchase-order")
 def create_purchase_order(data: dict, db: Session = Depends(get_db)):
-    """
-    US-3.1: Automated purchase orders based on wear forecasts.
+    """Generates an automated purchase order for a part.
+
+    Args:
+        data (dict): Dictionary containing partId and quantity.
+        db (Session): Database session dependency.
+
+    Raises:
+        HTTPException: If the part is not found.
+
+    Returns:
+        dict: Generated PO details including PO number and expected delivery.
     """
     part_id = data.get("partId")
     quantity = data.get("quantity", 10) # Bulk order
@@ -64,7 +102,6 @@ def create_purchase_order(data: dict, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Part not found")
         
     # In a real app, this would trigger an ERP integration or send a PO email
-    # For now, we update the status and log it
     
     return {
         "status": "PO_GENERATED",
@@ -76,8 +113,16 @@ def create_purchase_order(data: dict, db: Session = Depends(get_db)):
 
 @router.get("/jit-alerts")
 def get_jit_procurement_alerts(db: Session = Depends(get_db)):
-    """
-    US-3.1: Trigger JIT alert when RUL < Lead-Time + 10%
+    """Triggers Just-In-Time (JIT) procurement alerts based on RUL forecasts.
+
+    Alerts are triggered when the Remaining Useful Life (RUL) of an asset is 
+    less than the lead time of required spare parts plus a 10% buffer.
+
+    Args:
+        db (Session): Database session dependency.
+
+    Returns:
+        list: A list of JIT procurement alerts for all monitored assets.
     """
     from precognito.ingestion.influx_client import get_all_devices
     

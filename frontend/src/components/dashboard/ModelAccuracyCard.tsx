@@ -1,3 +1,7 @@
+/**
+ * @file ModelAccuracyCard component for displaying detailed ML model detection metrics.
+ */
+
 "use client";
 
 import { ModelMetrics } from "@/lib/types";
@@ -6,6 +10,13 @@ interface ModelAccuracyCardProps {
   metrics: ModelMetrics[];
 }
 
+/**
+ * Renders a card with a confusion matrix summary (TP, FP, TN, FN) and derived scores.
+ * 
+ * @param {ModelAccuracyCardProps} props The component props.
+ * @param {ModelMetrics[]} props.metrics Array of historical model metrics.
+ * @returns {JSX.Element} The rendered model accuracy card.
+ */
 export function ModelAccuracyCard({ metrics }: ModelAccuracyCardProps) {
   const latest = metrics[metrics.length - 1];
   

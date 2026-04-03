@@ -1,6 +1,18 @@
+/**
+ * @fileoverview Middleware for handling authentication and routing redirects.
+ * This module ensures that users are redirected to the login page when 
+ * attempting to access protected dashboard routes without a valid session.
+ */
+
 import { auth } from "@/lib/auth";
 import { NextResponse, type NextRequest } from "next/server";
 
+/**
+ * Middleware function to intercept and process incoming requests.
+ * 
+ * @param {NextRequest} request The incoming Next.js request object.
+ * @returns {Promise<NextResponse>} The next response or a redirect.
+ */
 export default async function middleware(request: NextRequest) {
   // We can't use auth.api.getSession directly in middleware easily due to 
   // how better-auth handles requests in Edge runtime, but we can check 

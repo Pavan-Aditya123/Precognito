@@ -1,7 +1,16 @@
+/**
+ * @file OfflineIndicator component that alerts the user when they are offline.
+ */
+
 "use client";
 
 import { useState, useEffect } from "react";
 
+/**
+ * A fixed-position indicator that appears when the application is offline.
+ * 
+ * @returns {JSX.Element | null} The offline indicator or null if online.
+ */
 export function OfflineIndicator() {
   const [isOnline, setIsOnline] = useState(true);
 

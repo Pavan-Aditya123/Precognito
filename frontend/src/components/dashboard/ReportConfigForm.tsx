@@ -1,3 +1,7 @@
+/**
+ * @file ReportConfigForm component for configuring report generation settings.
+ */
+
 "use client";
 
 import { useState } from "react";
@@ -28,6 +32,13 @@ const assetOptions = [
   { id: "AST-006", name: "Generator F1" },
 ];
 
+/**
+ * A form for configuring and triggering report generation.
+ * 
+ * @param {ReportConfigFormProps} props The component props.
+ * @param {function(object): void} props.onGenerate Callback triggered when the generate button is clicked.
+ * @returns {JSX.Element} The rendered report configuration form.
+ */
 export function ReportConfigForm({ onGenerate }: ReportConfigFormProps) {
   const [type, setType] = useState<ReportType>("PDF");
   const [category, setCategory] = useState<ReportCategory>("HEALTH");
@@ -35,10 +46,18 @@ export function ReportConfigForm({ onGenerate }: ReportConfigFormProps) {
   const [dateFrom, setDateFrom] = useState("2026-03-01");
   const [dateTo, setDateTo] = useState("2026-03-23");
 
+  /**
+   * Handles the report generation trigger.
+   */
   const handleGenerate = () => {
     onGenerate({ type, category, assets: selectedAssets, dateRange: { from: dateFrom, to: dateTo } });
   };
 
+  /**
+   * Toggles asset selection.
+   * 
+   * @param {string} id The asset ID to toggle.
+   */
   const toggleAsset = (id: string) => {
     setSelectedAssets((prev) =>
       prev.includes(id) ? prev.filter((a) => a !== id) : [...prev, id]

@@ -1,3 +1,7 @@
+/**
+ * @file Assets overview page for monitoring the health and RUL of all assets.
+ */
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -6,12 +10,20 @@ import { StatsBar } from "@/components/dashboard/StatsBar";
 import { api } from "@/lib/api";
 import { Asset } from "@/lib/types";
 
+/**
+ * Renders the assets overview page with status statistics and a grid of asset cards.
+ * 
+ * @returns {JSX.Element} The rendered assets page.
+ */
 export default function AssetsPage() {
   const [assets, setAssets] = useState<Asset[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    /**
+     * Loads the list of assets from the API.
+     */
     async function loadAssets() {
       try {
         const data = await api.getAssets();

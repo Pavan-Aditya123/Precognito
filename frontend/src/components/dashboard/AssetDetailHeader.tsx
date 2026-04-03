@@ -1,3 +1,7 @@
+/**
+ * @file AssetDetailHeader component for displaying detailed asset information at the top of an asset page.
+ */
+
 "use client";
 
 import { Asset } from "@/lib/types";
@@ -7,6 +11,12 @@ interface AssetDetailHeaderProps {
   asset: Asset;
 }
 
+/**
+ * Formats RUL hours into a readable string (e.g., "5 days" or "1d 5h").
+ * 
+ * @param {number} hours The number of remaining hours.
+ * @returns {string} The formatted RUL string.
+ */
 function formatRUL(hours: number): string {
   if (hours < 24) return `${hours} hrs`;
   const days = Math.floor(hours / 24);
@@ -15,6 +25,13 @@ function formatRUL(hours: number): string {
   return `${days}d ${remainingHours}h`;
 }
 
+/**
+ * Renders the header for the asset detail page including name, status, location, RMS, and RUL.
+ * 
+ * @param {AssetDetailHeaderProps} props The component props.
+ * @param {Asset} props.asset The asset data object.
+ * @returns {JSX.Element} The rendered asset detail header.
+ */
 export function AssetDetailHeader({ asset }: AssetDetailHeaderProps) {
   const statusColor = {
     GREEN: "bg-[#22c55e]",

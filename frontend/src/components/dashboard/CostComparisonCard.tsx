@@ -1,3 +1,7 @@
+/**
+ * @file CostComparisonCard component for comparing emergency vs scheduled repair costs.
+ */
+
 "use client";
 
 import { CostAnalysis } from "@/lib/types";
@@ -7,6 +11,13 @@ interface CostComparisonCardProps {
   costAnalysis: CostAnalysis;
 }
 
+/**
+ * Renders a comparison card showing emergency repair costs versus scheduled maintenance savings.
+ * 
+ * @param {CostComparisonCardProps} props The component props.
+ * @param {CostAnalysis} props.costAnalysis The cost analysis data.
+ * @returns {JSX.Element} The rendered cost comparison card.
+ */
 export function CostComparisonCard({ costAnalysis }: CostComparisonCardProps) {
   const savings = costAnalysis.emergencyRepairCost - costAnalysis.scheduledRepairCost;
   const savingsPercent = ((savings / costAnalysis.emergencyRepairCost) * 100).toFixed(0);

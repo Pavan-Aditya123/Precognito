@@ -1,3 +1,6 @@
+"""
+Core ingestion module that orchestrates the processing of incoming sensor data.
+"""
 import logging
 from precognito.ingestion.preprocess import preprocess
 from precognito.ingestion.heartbeat import update_heartbeat, check_device_status
@@ -11,8 +14,20 @@ from precognito.work_orders.utils import create_automatic_work_order
 logger = logging.getLogger(__name__)
 
 def process_ingestion(device_id: str, raw_data: dict):
-    """
-    Core logic for processing incoming sensor data from any source (HTTP, MQTT, etc.)
+    """Core logic for processing incoming sensor data from any source (HTTP, MQTT, etc.).
+
+    Performs preprocessing, heartbeat updates, anomaly detection, predictive analysis,
+    safety checks, and saves results to InfluxDB. Also triggers notifications and
+    automatic work orders based on detection results.
+
+    Args:
+        device_id (str): The unique identifier of the device.
+        raw_data (dict): The raw telemetry data received from the sensor.
+
+    Returns:
+        dict: A dictionary containing the results of all processing steps, 
+              including status, anomaly analysis, predictive analysis, 
+              safety analysis, and alert level. Returns None if device_id is missing.
     """
     if not device_id:
         logger.error("device_id is required for ingestion")

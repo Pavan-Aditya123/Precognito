@@ -1,3 +1,7 @@
+/**
+ * @file RULTrendChart component for visualizing Remaining Useful Life (RUL) predictions.
+ */
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -17,6 +21,13 @@ interface RULTrendChartProps {
   data: RULTrendPoint[];
 }
 
+/**
+ * Renders an area chart showing the RUL prediction trend with confidence intervals.
+ * 
+ * @param {RULTrendChartProps} props The component props.
+ * @param {RULTrendPoint[]} props.data Array of RUL trend data points.
+ * @returns {JSX.Element} The rendered RUL trend chart.
+ */
 export function RULTrendChart({ data }: RULTrendChartProps) {
   const [mounted, setMounted] = useState(false);
 

@@ -1,3 +1,6 @@
+"""
+Sensor simulation module for generating and sending synthetic telemetry data.
+"""
 import random
 import time
 import json
@@ -9,6 +12,14 @@ import numpy as np
 from precognito.ingestion.dsp import process_raw_edge_data
 
 def generate_sensor_data(device_id="machine_1"):
+    """Generates synthetic sensor telemetry data.
+
+    Args:
+        device_id (str, optional): The ID of the device to simulate. Defaults to "machine_1".
+
+    Returns:
+        dict: A dictionary containing simulated sensor readings and edge features.
+    """
     # Normal ranges based on SENSOR_CONFIG in anomaly/core.py
     # temperature: 295-305, vibration: 1000-2000, torque: 20-60
     
@@ -53,6 +64,14 @@ def generate_sensor_data(device_id="machine_1"):
     }
 
 def run_http_simulator(url, device_id, interval, auth_token):
+    """Runs the simulator in HTTP mode, sending data to a specified URL.
+
+    Args:
+        url (str): The ingestion endpoint URL.
+        device_id (str): The ID of the device to simulate.
+        interval (float): Time in seconds between transmissions.
+        auth_token (str): Bearer token for authentication.
+    """
     print(f"Starting HTTP Simulator sending to {url}...")
     headers = {}
     if auth_token:
@@ -74,6 +93,14 @@ def run_http_simulator(url, device_id, interval, auth_token):
         time.sleep(interval)
 
 def run_mqtt_simulator(broker, port, device_id, interval):
+    """Runs the simulator in MQTT mode, publishing data to a broker.
+
+    Args:
+        broker (str): The MQTT broker address.
+        port (int): The MQTT broker port.
+        device_id (str): The ID of the device to simulate.
+        interval (float): Time in seconds between transmissions.
+    """
     print(f"Starting MQTT Simulator sending to {broker}:{port}...")
     client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
     client.connect(broker, port, 60)

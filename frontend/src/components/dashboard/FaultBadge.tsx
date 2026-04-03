@@ -1,3 +1,7 @@
+/**
+ * @file FaultBadge component for displaying a specific fault prediction and confidence level.
+ */
+
 "use client";
 
 import { FaultPrediction } from "@/lib/types";
@@ -6,6 +10,13 @@ interface FaultBadgeProps {
   prediction: FaultPrediction;
 }
 
+/**
+ * Renders a badge indicating the type of predicted fault and the model's confidence.
+ * 
+ * @param {FaultBadgeProps} props The component props.
+ * @param {FaultPrediction} props.prediction The fault prediction data.
+ * @returns {JSX.Element} The rendered fault badge.
+ */
 export function FaultBadge({ prediction }: FaultBadgeProps) {
   const isNormal = prediction.faultType === "Normal Operation";
   const statusColor = isNormal 

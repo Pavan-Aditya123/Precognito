@@ -1,3 +1,7 @@
+/**
+ * @file Asset detail page for viewing telemetry, predictions, and fault analysis for a specific asset.
+ */
+
 "use client";
 
 import { useState, useEffect, use } from "react";
@@ -13,6 +17,13 @@ interface AssetDetailPageProps {
   params: Promise<{ id: string }>;
 }
 
+/**
+ * Renders the asset detail page with real-time telemetry and predictive maintenance data.
+ * 
+ * @param {AssetDetailPageProps} props The component props.
+ * @param {Promise<{id: string}>} props.params The route parameters containing the asset ID.
+ * @returns {JSX.Element} The rendered asset detail page.
+ */
 export default function AssetDetailPage({ params }: AssetDetailPageProps) {
   const { id } = use(params);
   const [asset, setAsset] = useState<Asset | null>(null);
@@ -22,6 +33,9 @@ export default function AssetDetailPage({ params }: AssetDetailPageProps) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    /**
+     * Loads asset data, telemetry, and predictions from the API.
+     */
     async function loadData() {
       try {
         const [assetsData, telData, predData] = await Promise.all([

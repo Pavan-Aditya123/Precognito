@@ -1,3 +1,9 @@
+/**
+ * @fileoverview Mock data and utility functions for development and testing.
+ * This module provides static data for assets, alerts, sensors, and other 
+ * system components, along with functions to query and generate this data.
+ */
+
 import { Asset, Alert, SensorStatus, FFTBin, RULTrendPoint, FaultPrediction, Report, HealthTrend, SparePart, WorkOrder, CostAnalysis, ModelMetrics, AssetDocumentation, AuditEntry, ThermalAlert, TemperatureTrendPoint } from "./types";
 
 export const mockAssets: Asset[] = [
@@ -114,6 +120,11 @@ export const mockSensors: SensorStatus[] = [
   },
 ];
 
+/**
+ * Calculates high-level statistics for all mock assets.
+ * 
+ * @returns {Object} An object containing total, healthy, warning, and critical counts.
+ */
 export function getAssetStats() {
   const assets = mockAssets;
   return {
@@ -167,6 +178,12 @@ export const mockHealthTrend: HealthTrend[] = [
   { date: "Mar 23", healthy: 3, warning: 2, critical: 1 },
 ];
 
+/**
+ * Generates mock Fast Fourier Transform (FFT) vibration data for an asset.
+ * 
+ * @param {string} assetId The ID of the asset.
+ * @returns {FFTBin[]} An array of FFT bins.
+ */
 function generateFFTData(assetId: string): FFTBin[] {
   const asset = mockAssets.find((a) => a.id === assetId);
   const bins: FFTBin[] = [];
@@ -192,6 +209,12 @@ function generateFFTData(assetId: string): FFTBin[] {
   return bins;
 }
 
+/**
+ * Generates mock Remaining Useful Life (RUL) trend data for an asset.
+ * 
+ * @param {string} assetId The ID of the asset.
+ * @returns {RULTrendPoint[]} An array of RUL trend points.
+ */
 function generateRULTrend(assetId: string): RULTrendPoint[] {
   const asset = mockAssets.find((a) => a.id === assetId);
   const currentRUL = asset?.rul || 100;
@@ -227,18 +250,42 @@ mockAssets.forEach((asset) => {
   mockRULTrendData[asset.id] = generateRULTrend(asset.id);
 });
 
+/**
+ * Retrieves an asset by its ID.
+ * 
+ * @param {string} id The ID of the asset.
+ * @returns {Asset | undefined} The asset object if found, otherwise undefined.
+ */
 export function getAssetById(id: string): Asset | undefined {
   return mockAssets.find((a) => a.id === id);
 }
 
+/**
+ * Retrieves mock FFT vibration data for a specific asset.
+ * 
+ * @param {string} assetId The ID of the asset.
+ * @returns {FFTBin[]} An array of FFT bins.
+ */
 export function getFFTData(assetId: string): FFTBin[] {
   return mockFFTData[assetId] || [];
 }
 
+/**
+ * Retrieves mock RUL trend data for a specific asset.
+ * 
+ * @param {string} assetId The ID of the asset.
+ * @returns {RULTrendPoint[]} An array of RUL trend points.
+ */
 export function getRULTrend(assetId: string): RULTrendPoint[] {
   return mockRULTrendData[assetId] || [];
 }
 
+/**
+ * Retrieves the fault prediction for a specific asset.
+ * 
+ * @param {string} assetId The ID of the asset.
+ * @returns {FaultPrediction | undefined} The fault prediction object if found.
+ */
 export function getFaultPrediction(assetId: string): FaultPrediction | undefined {
   return mockFaultPredictions[assetId];
 }
@@ -270,6 +317,11 @@ export const mockCostAnalysis: CostAnalysis[] = [
   { assetId: "AST-001", assetName: "Compressor A1", riskOfFailurePerHour: 1800, emergencyRepairCost: 8000, scheduledRepairCost: 3500, potentialDowntimeHours: 12, riskScore: 22, recommendation: "MONITOR" },
 ];
 
+/**
+ * Generates a collection of mock model performance metrics for the last 30 days.
+ * 
+ * @returns {ModelMetrics[]} An array of model metrics objects.
+ */
 function generateModelMetrics(): ModelMetrics[] {
   const metrics: ModelMetrics[] = [];
   for (let i = 30; i >= 0; i--) {
@@ -300,14 +352,31 @@ function generateModelMetrics(): ModelMetrics[] {
 
 export const mockModelMetrics = generateModelMetrics();
 
+/**
+ * Retrieves a spare part by its ID.
+ * 
+ * @param {string} id The ID of the spare part.
+ * @returns {SparePart | undefined} The spare part object if found.
+ */
 export function getSparePartById(id: string): SparePart | undefined {
   return mockSpareParts.find((p) => p.id === id);
 }
 
+/**
+ * Retrieves all work orders associated with a specific asset.
+ * 
+ * @param {string} assetId The ID of the asset.
+ * @returns {WorkOrder[]} An array of work order objects.
+ */
 export function getWorkOrdersByAsset(assetId: string): WorkOrder[] {
   return mockWorkOrders.filter((wo) => wo.assetId === assetId);
 }
 
+/**
+ * Identifies spare parts that require Just-in-Time (JIT) procurement based on RUL.
+ * 
+ * @returns {SparePart[]} An array of spare parts needing alerts.
+ */
 export function getJITAlerts(): SparePart[] {
   return mockSpareParts.filter((part) => {
     if (part.rulThreshold && part.assetId) {
@@ -482,6 +551,13 @@ export const mockThermalAlerts: ThermalAlert[] = [
   },
 ];
 
+/**
+ * Generates mock temperature trend data for a specific asset.
+ * 
+ * @param {string} assetId The ID of the asset.
+ * @param {number} baselineTemp The baseline temperature for the asset.
+ * @returns {TemperatureTrendPoint[]} An array of temperature trend points.
+ */
 function generateTemperatureTrend(assetId: string, baselineTemp: number): TemperatureTrendPoint[] {
   const points: TemperatureTrendPoint[] = [];
   for (let i = 24; i >= 0; i--) {
@@ -503,14 +579,31 @@ export const mockTemperatureTrends: Record<string, TemperatureTrendPoint[]> = {
   "AST-001": generateTemperatureTrend("AST-001", 58),
 };
 
+/**
+ * Retrieves maintenance documentation for a specific asset.
+ * 
+ * @param {string} assetId The ID of the asset.
+ * @returns {AssetDocumentation | undefined} The asset documentation object if found.
+ */
 export function getDocumentationByAsset(assetId: string): AssetDocumentation | undefined {
   return mockAssetDocumentation.find((d) => d.assetId === assetId);
 }
 
+/**
+ * Retrieves all thermal alerts associated with a specific asset.
+ * 
+ * @param {string} assetId The ID of the asset.
+ * @returns {ThermalAlert[]} An array of thermal alert objects.
+ */
 export function getThermalAlertsByAsset(assetId: string): ThermalAlert[] {
   return mockThermalAlerts.filter((a) => a.assetId === assetId);
 }
 
+/**
+ * Retrieves all thermal alerts that have not yet been acknowledged.
+ * 
+ * @returns {ThermalAlert[]} An array of unacknowledged thermal alerts.
+ */
 export function getUnacknowledgedThermalAlerts(): ThermalAlert[] {
   return mockThermalAlerts.filter((a) => !a.acknowledged);
 }

@@ -1,3 +1,7 @@
+/**
+ * @file AssetGrid component for displaying a responsive grid of asset cards.
+ */
+
 import { Asset } from "@/lib/types";
 import { AssetCard } from "./AssetCard";
 
@@ -5,6 +9,13 @@ interface AssetGridProps {
   assets: Asset[];
 }
 
+/**
+ * Renders a grid of AssetCard components.
+ * 
+ * @param {AssetGridProps} props The component props.
+ * @param {Asset[]} props.assets Array of assets to display in the grid.
+ * @returns {JSX.Element} The rendered asset grid.
+ */
 export function AssetGrid({ assets }: AssetGridProps) {
   if (assets.length === 0) {
     return (

@@ -1,19 +1,32 @@
+"""
+Digital Signal Processing (DSP) module for analyzing raw sensor waveforms.
+"""
 import numpy as np
 from typing import Dict, List
 
 def calculate_rms(samples: np.ndarray) -> float:
-    """
-    Calculate Root Mean Square of a signal.
-    This is what the Edge device (ESP32) would calculate locally.
+    """Calculates the Root Mean Square (RMS) of a signal.
+
+    Args:
+        samples (np.ndarray): An array of signal samples.
+
+    Returns:
+        float: The RMS value of the signal.
     """
     if len(samples) == 0:
         return 0.0
     return float(np.sqrt(np.mean(samples**2)))
 
 def extract_fft_peaks(samples: np.ndarray, sampling_rate: int = 1000) -> Dict[str, float]:
-    """
-    Perform Fast Fourier Transform and extract dominant frequency amplitudes.
-    Simulates the Edge device compressing high-frequency data.
+    """Performs FFT and extracts dominant frequency amplitudes.
+
+    Args:
+        samples (np.ndarray): An array of signal samples.
+        sampling_rate (int, optional): The sampling rate in Hz. Defaults to 1000.
+
+    Returns:
+        Dict[str, float]: A dictionary containing normalized amplitudes for 
+                          1x and BPFO frequency spikes.
     """
     n = len(samples)
     if n == 0:
@@ -42,8 +55,14 @@ def extract_fft_peaks(samples: np.ndarray, sampling_rate: int = 1000) -> Dict[st
     }
 
 def process_raw_edge_data(raw_values: List[float]) -> Dict[str, float]:
-    """
-    Unified entry point for simulated Edge processing.
+    """Processes raw edge data by calculating RMS and FFT peaks.
+
+    Args:
+        raw_values (List[float]): A list of raw signal values.
+
+    Returns:
+        Dict[str, float]: A dictionary containing processed metrics: 
+                          'vibration_rms', 'freq_spike_1x', and 'freq_spike_bpfo'.
     """
     samples = np.array(raw_values)
     rms = calculate_rms(samples)

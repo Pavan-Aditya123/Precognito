@@ -1,3 +1,7 @@
+/**
+ * @file FFTChart component for visualizing vibration frequency analysis (FFT).
+ */
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -17,6 +21,13 @@ interface FFTChartProps {
   data: FFTBin[];
 }
 
+/**
+ * Renders a bar chart comparing current vibration amplitudes against baseline across frequency bins.
+ * 
+ * @param {FFTChartProps} props The component props.
+ * @param {FFTBin[]} props.data Array of FFT data bins.
+ * @returns {JSX.Element} The rendered FFT chart.
+ */
 export function FFTChart({ data }: FFTChartProps) {
   const [mounted, setMounted] = useState(false);
 

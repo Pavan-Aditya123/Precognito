@@ -1,3 +1,7 @@
+/**
+ * @file StatusBadge component for displaying asset status with color coding.
+ */
+
 import { AssetStatus } from "@/lib/types";
 
 const statusColors: Record<AssetStatus, string> = {
@@ -17,6 +21,14 @@ interface StatusBadgeProps {
   showLabel?: boolean;
 }
 
+/**
+ * Renders a status badge with a color indicator and label.
+ * 
+ * @param {StatusBadgeProps} props The component props.
+ * @param {AssetStatus} props.status The status to display.
+ * @param {boolean} [props.showLabel=true] Whether to show the status label.
+ * @returns {JSX.Element} The rendered status badge.
+ */
 export function StatusBadge({ status, showLabel = true }: StatusBadgeProps) {
   return (
     <span

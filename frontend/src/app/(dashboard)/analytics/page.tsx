@@ -1,3 +1,9 @@
+/**
+ * @fileoverview Analytics page for monitoring machine learning model performance.
+ * This module displays accuracy metrics, false discovery rates, and 
+ * performance trends for the anomaly detection and predictive maintenance engine.
+ */
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -7,11 +13,19 @@ import { ModelAccuracyCard } from "@/components/dashboard/ModelAccuracyCard";
 import { PerformanceTrend } from "@/components/dashboard/PerformanceTrend";
 import { api } from "@/lib/api";
 
+/**
+ * AnalyticsPage component for visualizing ML model performance and validation.
+ * 
+ * @returns {JSX.Element} The rendered analytics page.
+ */
 export default function AnalyticsPage() {
   const [metrics, setMetrics] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   
   useEffect(() => {
+    /**
+     * Fetches model performance metrics from the API.
+     */
     async function loadMetrics() {
       try {
         const data = await api.getModelMetrics();

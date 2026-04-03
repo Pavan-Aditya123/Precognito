@@ -1,3 +1,9 @@
+/**
+ * @fileoverview Work Order management page for maintenance tracking and compliance.
+ * This module handles digital documentation access, compliance audit trails, 
+ * and QR-code-based field check-ins for maintenance technicians.
+ */
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -10,6 +16,11 @@ import Link from "next/link";
 
 type TabType = "docs" | "audit" | "checkin";
 
+/**
+ * WorkOrdersPage component for maintenance execution and compliance tracking.
+ * 
+ * @returns {JSX.Element} The rendered work orders page.
+ */
 export default function WorkOrdersPage() {
   const [activeTab, setActiveTab] = useState<TabType>("docs");
   const [showScanner, setShowScanner] = useState(false);
@@ -19,6 +30,9 @@ export default function WorkOrdersPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    /**
+     * Loads work order data for the audit trail.
+     */
     async function loadWorkOrders() {
       try {
         const data = await fetch("/api/work-orders").then(res => res.json()).catch(() => []);
@@ -38,6 +52,12 @@ export default function WorkOrdersPage() {
     ? mockAssetDocumentation.find((d) => d.assetId === selectedAsset)
     : mockAssetDocumentation[0];
 
+  /**
+   * Handles the processing of a scanned QR code.
+   * 
+   * @param {string} data The scanned QR code data (usually an asset ID).
+   * @returns {Promise<void>}
+   */
   const handleScan = async (data: string) => {
     setShowScanner(false);
     const assetId = data.toUpperCase();

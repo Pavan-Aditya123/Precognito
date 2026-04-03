@@ -1,3 +1,7 @@
+/**
+ * @file ReportChart component for visualizing asset health trends using a line chart.
+ */
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -17,6 +21,13 @@ interface ReportChartProps {
   data: HealthTrend[];
 }
 
+/**
+ * Renders a line chart showing the trend of healthy, warning, and critical assets over time.
+ * 
+ * @param {ReportChartProps} props The component props.
+ * @param {HealthTrend[]} props.data Array of health trend data points.
+ * @returns {JSX.Element} The rendered report chart.
+ */
 export function ReportChart({ data }: ReportChartProps) {
   const [mounted, setMounted] = useState(false);
 

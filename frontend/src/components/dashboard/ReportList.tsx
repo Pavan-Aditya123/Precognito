@@ -1,3 +1,7 @@
+/**
+ * @file ReportList component for displaying a history of generated reports.
+ */
+
 "use client";
 
 import { Report } from "@/lib/types";
@@ -7,11 +11,23 @@ interface ReportListProps {
   onDownload?: (report: Report) => void;
 }
 
+/**
+ * Formats an ISO date string into a readable format (e.g., "Mar 23, 2026").
+ * 
+ * @param {string} isoString The ISO date string.
+ * @returns {string} The formatted date string.
+ */
 function formatDate(isoString: string): string {
   const date = new Date(isoString);
   return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 }
 
+/**
+ * Gets a human-readable label for a report category.
+ * 
+ * @param {string} category The category key.
+ * @returns {string} The display label for the category.
+ */
 function getCategoryLabel(category: string): string {
   const labels: Record<string, string> = {
     HEALTH: "Health",
@@ -21,6 +37,14 @@ function getCategoryLabel(category: string): string {
   return labels[category] || category;
 }
 
+/**
+ * Renders a list of generated reports with download actions.
+ * 
+ * @param {ReportListProps} props The component props.
+ * @param {Report[]} props.reports Array of generated reports.
+ * @param {function(Report): void} [props.onDownload] Callback when a download button is clicked.
+ * @returns {JSX.Element} The rendered report list.
+ */
 export function ReportList({ reports, onDownload }: ReportListProps) {
   if (reports.length === 0) {
     return (

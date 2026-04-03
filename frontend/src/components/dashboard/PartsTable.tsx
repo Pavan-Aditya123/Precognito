@@ -1,3 +1,7 @@
+/**
+ * @file PartsTable component for displaying inventory of spare parts.
+ */
+
 "use client";
 
 import { SparePart } from "@/lib/types";
@@ -16,6 +20,15 @@ const statusColors: Record<string, string> = {
   ORDERED: "bg-[#3b82f6]",
 };
 
+/**
+ * Renders a table of spare parts with details on stock levels, costs, and status.
+ * 
+ * @param {PartsTableProps} props The component props.
+ * @param {SparePart[]} props.parts Array of spare parts to display.
+ * @param {keyof SparePart} [props.sortField] The field currently being sorted.
+ * @param {"asc" | "desc"} [props.sortDirection] The direction of the sort.
+ * @returns {JSX.Element} The rendered parts table.
+ */
 export function PartsTable({ parts, sortField, sortDirection }: PartsTableProps) {
   return (
     <div className="border border-[#334155] rounded-lg overflow-hidden">

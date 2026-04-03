@@ -1,3 +1,7 @@
+/**
+ * @file Sidebar component for the application's primary navigation menu.
+ */
+
 "use client";
 
 import Link from "next/link";
@@ -20,6 +24,11 @@ const allNavItems = [
   { href: "/settings", label: "Settings" },
 ];
 
+/**
+ * Renders the primary application sidebar with navigation links filtered by user role.
+ * 
+ * @returns {JSX.Element} The rendered sidebar component.
+ */
 export function Sidebar() {
   const pathname = usePathname();
   const { data: session } = useSession();

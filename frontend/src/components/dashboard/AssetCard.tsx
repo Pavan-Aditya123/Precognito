@@ -1,3 +1,7 @@
+/**
+ * @file AssetCard component for displaying a summary of an individual asset.
+ */
+
 import Link from "next/link";
 import { Asset } from "@/lib/types";
 import { StatusBadge } from "@/components/ui/StatusBadge";
@@ -6,6 +10,13 @@ interface AssetCardProps {
   asset: Asset;
 }
 
+/**
+ * Renders a summary card for an asset including its status, location, RMS, and RUL.
+ * 
+ * @param {AssetCardProps} props The component props.
+ * @param {Asset} props.asset The asset data object.
+ * @returns {JSX.Element} The rendered asset card.
+ */
 export function AssetCard({ asset }: AssetCardProps) {
   return (
     <Link

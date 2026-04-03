@@ -1,3 +1,6 @@
+"""
+Utility functions for work order management, including automated creation and assignment.
+"""
 from sqlalchemy.orm import Session
 from precognito.work_orders.database import SessionLocal
 from precognito.work_orders import models
@@ -7,9 +10,19 @@ import logging
 logger = logging.getLogger(__name__)
 
 def create_automatic_work_order(device_id: str, severity: str, reason: str):
-    """
-    US-4.1: Automatically generate a work order when anomaly exceeds threshold.
-    Now with automated Technician Assignment (FR 17.4)
+    """Automatically generates a work order when an anomaly exceeds thresholds.
+
+    Performs automated technician assignment based on availability and workload
+    balancing (round-robin style using lastAssigned timestamp).
+
+    Args:
+        device_id (str): The unique identifier of the machine/asset.
+        severity (str): The severity level of the detected anomaly.
+        reason (str): The reason or fault type detected.
+
+    Returns:
+        models.Audit: The newly created work order (Audit) object, or None 
+                      if an active work order already exists or creation failed.
     """
     db = SessionLocal()
     try:

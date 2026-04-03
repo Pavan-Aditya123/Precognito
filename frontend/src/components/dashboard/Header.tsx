@@ -1,3 +1,7 @@
+/**
+ * @file Header component for the application's top navigation bar.
+ */
+
 "use client";
 
 import { useState } from "react";
@@ -8,12 +12,20 @@ import { api } from "@/lib/api";
 import { NotificationBell } from "./NotificationBell";
 import { roleColors } from "@/lib/constants";
 
+/**
+ * Renders the top navigation header with logo, notifications, and user profile dropdown.
+ * 
+ * @returns {JSX.Element | null} The rendered header or null if user is not logged in.
+ */
 export function Header() {
   const { data: session } = useSession();
   const user = session?.user;
   const router = useRouter();
   const [showDropdown, setShowDropdown] = useState(false);
 
+  /**
+   * Handles user sign out and redirection to the login page.
+   */
   const handleLogout = async () => {
     await signOut();
     router.push("/login");

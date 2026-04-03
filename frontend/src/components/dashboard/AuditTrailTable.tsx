@@ -1,3 +1,7 @@
+/**
+ * @file AuditTrailTable component for displaying technician activity logs.
+ */
+
 "use client";
 
 import { AuditEntry } from "@/lib/types";
@@ -7,6 +11,13 @@ interface AuditTrailTableProps {
   entries: AuditEntry[];
 }
 
+/**
+ * Renders a table of audit trail entries showing technician actions on assets.
+ * 
+ * @param {AuditTrailTableProps} props The component props.
+ * @param {AuditEntry[]} props.entries Array of audit trail entries.
+ * @returns {JSX.Element} The rendered audit trail table.
+ */
 export function AuditTrailTable({ entries }: AuditTrailTableProps) {
   const sortedEntries = [...entries].sort(
     (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()

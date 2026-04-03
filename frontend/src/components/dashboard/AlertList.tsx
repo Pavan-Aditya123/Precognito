@@ -1,3 +1,7 @@
+/**
+ * @file AlertList component for displaying and filtering a list of alerts.
+ */
+
 "use client";
 
 import { useState } from "react";
@@ -12,6 +16,13 @@ type SeverityFilter = "ALL" | "CRITICAL" | "HIGH" | "MEDIUM" | "LOW";
 
 const filters: SeverityFilter[] = ["ALL", "CRITICAL", "HIGH", "MEDIUM", "LOW"];
 
+/**
+ * Renders a list of alerts with filtering and sorting capabilities.
+ * 
+ * @param {AlertListProps} props The component props.
+ * @param {Alert[]} props.alerts The array of alerts to display.
+ * @returns {JSX.Element} The rendered alert list.
+ */
 export function AlertList({ alerts }: AlertListProps) {
   const [activeFilter, setActiveFilter] = useState<SeverityFilter>("ALL");
 
@@ -29,6 +40,12 @@ export function AlertList({ alerts }: AlertListProps) {
     return severityOrder[a.severity] - severityOrder[b.severity];
   });
 
+  /**
+   * Gets the count of alerts for a specific severity filter.
+   * 
+   * @param {SeverityFilter} filter The filter to count for.
+   * @returns {number} The count of alerts.
+   */
   const getAlertCount = (filter: SeverityFilter): number => {
     if (filter === "ALL") return alerts.length;
     return alerts.filter((a) => a.severity === filter).length;

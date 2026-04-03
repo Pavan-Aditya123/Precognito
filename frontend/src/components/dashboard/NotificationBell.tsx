@@ -1,13 +1,23 @@
+/**
+ * @file NotificationBell component for real-time alerts using Server-Sent Events (SSE).
+ */
+
 "use client";
 
 import { useState, useEffect } from "react";
 import { ThermalAlert } from "@/lib/types";
-import Link from "next/link";
 
 interface NotificationBellProps {
   alerts?: ThermalAlert[]; // Existing alerts from DB
 }
 
+/**
+ * Renders a notification bell that listens to real-time alerts via SSE (ntfy.sh).
+ * 
+ * @param {NotificationBellProps} props The component props.
+ * @param {ThermalAlert[]} [props.alerts=[]] Initial set of alerts.
+ * @returns {JSX.Element} The rendered notification bell and dropdown.
+ */
 export function NotificationBell({ alerts = [] }: NotificationBellProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [realTimeAlerts, setRealTimeAlerts] = useState<any[]>([]);

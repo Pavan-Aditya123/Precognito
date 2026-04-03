@@ -1,3 +1,9 @@
+/**
+ * @fileoverview Authentication page for user login and registration.
+ * This module provides the user interface for authenticating with email 
+ * and password, and supports role selection for new user creation during the demo.
+ */
+
 "use client";
 
 import { useState } from "react";
@@ -13,6 +19,11 @@ const roles = [
   { value: "STORE_MANAGER", label: "Store Manager" },
 ];
 
+/**
+ * LoginPage component for handling user authentication flows.
+ * 
+ * @returns {JSX.Element} The rendered login page.
+ */
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
@@ -21,6 +32,12 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  /**
+   * Handles form submission for authentication.
+   * 
+   * @param {React.FormEvent} e The form event.
+   * @returns {Promise<void>}
+   */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     

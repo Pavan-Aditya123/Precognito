@@ -1,3 +1,7 @@
+/**
+ * @file QRScanner component for scanning asset QR codes using the device camera.
+ */
+
 "use client";
 
 import { useState, useEffect, useRef } from "react";
@@ -7,6 +11,14 @@ interface QRScannerProps {
   onClose: () => void;
 }
 
+/**
+ * Renders a modal-style QR scanner with camera access and manual input fallback.
+ * 
+ * @param {QRScannerProps} props The component props.
+ * @param {function(string): void} props.onScan Callback triggered when a code is scanned or submitted.
+ * @param {function(): void} props.onClose Callback triggered when the scanner is closed.
+ * @returns {JSX.Element} The rendered QR scanner component.
+ */
 export function QRScanner({ onScan, onClose }: QRScannerProps) {
   const [isScanning, setIsScanning] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -14,6 +26,9 @@ export function QRScanner({ onScan, onClose }: QRScannerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
+  /**
+   * Requests camera permissions and starts the video stream.
+   */
   const startCamera = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -30,6 +45,9 @@ export function QRScanner({ onScan, onClose }: QRScannerProps) {
     }
   };
 
+  /**
+   * Stops the video stream and cleans up tracks.
+   */
   const stopCamera = () => {
     if (videoRef.current?.srcObject) {
       const stream = videoRef.current.srcObject as MediaStream;
@@ -45,11 +63,19 @@ export function QRScanner({ onScan, onClose }: QRScannerProps) {
     };
   }, []);
 
+  /**
+   * Simulates a QR scan for demonstration purposes.
+   */
   const simulateScan = () => {
     const mockData = `ASSET-${Math.random().toString(36).substring(7).toUpperCase()}`;
     onScan(mockData);
   };
 
+  /**
+   * Handles manual submission of asset IDs.
+   * 
+   * @param {React.FormEvent} e The form submit event.
+   */
   const handleManualSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (manualInput.trim()) {

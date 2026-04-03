@@ -1,3 +1,6 @@
+"""
+Predictive maintenance engine for RUL and fault type prediction.
+"""
 import os
 import joblib
 import pandas as pd
@@ -5,7 +8,18 @@ import numpy as np
 from pathlib import Path
 
 class PredictiveInferenceEngine:
+    """Engine for performing Remaining Useful Life (RUL) and fault type predictions.
+
+    Attributes:
+        scaler: Loaded MinMaxScaler for feature normalization.
+        rul_model: Loaded regression model for RUL estimation.
+        fault_model: Loaded classifier for fault type identification.
+        initialized (bool): Whether models were successfully loaded.
+    """
+
     def __init__(self):
+        """Initializes the engine and loads pre-trained models from the models directory.
+        """
         # Resolve models directory relative to this file
         base_path = Path(__file__).parent
         model_dir = base_path / "models"
@@ -20,9 +34,16 @@ class PredictiveInferenceEngine:
             self.initialized = False
     
     def predict(self, telemetry_data: dict) -> dict:
-        """
-        Receives dictionary of telemetry features.
-        Returns prediction containing RUL, fault classification, and confidence.
+        """Predicts RUL and fault type from telemetry data.
+
+        Args:
+            telemetry_data (dict): Dictionary of sensor features (vibration_rms, 
+                                   temperature, freq_spike_1x, freq_spike_bpfo).
+
+        Returns:
+            dict: Prediction results including predicted_rul_hours, 
+                  predicted_fault_type, confidence_score_percent, 
+                  risk_level, and recommendation.
         """
         if not self.initialized:
             return {
@@ -87,10 +108,23 @@ class PredictiveInferenceEngine:
 _engine = None
 
 def get_predictive_engine():
+    """Retrieves or initializes the global PredictiveInferenceEngine singleton.
+
+    Returns:
+        PredictiveInferenceEngine: The singleton instance.
+    """
     global _engine
     if _engine is None:
         _engine = PredictiveInferenceEngine()
     return _engine
 
 def predict_rul(data: dict) -> dict:
+    """Convenience wrapper for predicting RUL.
+
+    Args:
+        data (dict): Telemetry features.
+
+    Returns:
+        dict: Predictive results.
+    """
     return get_predictive_engine().predict(data)

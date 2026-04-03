@@ -1,3 +1,9 @@
+/**
+ * @fileoverview Inventory page for monitoring spare parts and JIT logistics.
+ * This module displays current stock levels, low-stock alerts, and 
+ * Just-in-Time procurement recommendations based on asset Remaining Useful Life (RUL).
+ */
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -7,6 +13,11 @@ import { StockAlertCard } from "@/components/dashboard/StockAlertCard";
 import { WorkOrderRow } from "@/components/dashboard/WorkOrderRow";
 import { api } from "@/lib/api";
 
+/**
+ * InventoryPage component for managing plant inventory and JIT alerts.
+ * 
+ * @returns {JSX.Element} The rendered inventory page.
+ */
 export default function InventoryPage() {
   const [spareParts, setSpareParts] = useState<any[]>([]);
   const [jitAlerts, setJitAlerts] = useState<any[]>([]);
@@ -14,6 +25,9 @@ export default function InventoryPage() {
   const workOrders = mockWorkOrders;
 
   useEffect(() => {
+    /**
+     * Loads inventory and JIT alert data from the backend.
+     */
     async function loadInventoryData() {
       try {
         const [parts, alerts] = await Promise.all([

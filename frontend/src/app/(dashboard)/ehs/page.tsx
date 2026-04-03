@@ -1,3 +1,9 @@
+/**
+ * @fileoverview Environmental Health and Safety (EHS) page for thermal monitoring.
+ * This module tracks asset temperatures, manages thermal safety alerts, 
+ * and provides visualization of temperature trends for safety compliance.
+ */
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -7,12 +13,20 @@ import { ThermalTrendChart } from "@/components/dashboard/ThermalTrendChart";
 import { ThermalAlert, Asset } from "@/lib/types";
 import { api } from "@/lib/api";
 
+/**
+ * EHSPage component for plant-wide thermal safety oversight.
+ * 
+ * @returns {JSX.Element} The rendered EHS safety dashboard.
+ */
 export default function EHSPage() {
   const [alerts, setAlerts] = useState<ThermalAlert[]>([]);
   const [assets, setAssets] = useState<Asset[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    /**
+     * Loads EHS-related safety alerts and asset data.
+     */
     async function loadEHSData() {
       try {
         const [alertsData, assetsData] = await Promise.all([
@@ -32,6 +46,11 @@ export default function EHSPage() {
     return () => clearInterval(interval);
   }, []);
 
+  /**
+   * Handles the acknowledgment of a thermal safety alert.
+   * 
+   * @param {string} alertId The ID of the alert to acknowledge.
+   */
   const handleAcknowledge = (alertId: string) => {
     setAlerts((prev) =>
       prev.map((a) =>

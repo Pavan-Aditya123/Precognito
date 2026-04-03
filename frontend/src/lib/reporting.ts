@@ -1,8 +1,16 @@
+/**
+ * @fileoverview Utility functions for generating and downloading reports.
+ */
+
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
 /**
- * Download data as CSV
+ * Downloads an array of objects as a CSV file.
+ *
+ * @param {any[]} data The array of objects to export.
+ * @param {string} fileName The name of the file to save as.
+ * @returns {void}
  */
 export function downloadCSV(data: any[], fileName: string) {
   if (data.length === 0) return;
@@ -28,7 +36,12 @@ export function downloadCSV(data: any[], fileName: string) {
 }
 
 /**
- * Download data as PDF table
+ * Generates and downloads a PDF table from an array of objects.
+ *
+ * @param {any[]} data The array of objects to export.
+ * @param {string} title The title to display at the top of the PDF.
+ * @param {string} fileName The name of the file to save as.
+ * @returns {void}
  */
 export function downloadPDF(data: any[], title: string, fileName: string) {
   if (data.length === 0) return;

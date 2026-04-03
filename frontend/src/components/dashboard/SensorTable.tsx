@@ -1,3 +1,7 @@
+/**
+ * @file SensorTable component for displaying a list of sensors and their statuses.
+ */
+
 "use client";
 
 import { SensorStatus } from "@/lib/types";
@@ -7,7 +11,20 @@ interface SensorTableProps {
   sensors: SensorStatus[];
 }
 
+/**
+ * Renders a table of sensors with a summary of their online/offline status.
+ * 
+ * @param {SensorTableProps} props The component props.
+ * @param {SensorStatus[]} props.sensors Array of sensors to display.
+ * @returns {JSX.Element} The rendered sensor table.
+ */
 export function SensorTable({ sensors }: SensorTableProps) {
+  /**
+   * Gets the count of sensors with a specific status.
+   * 
+   * @param {SensorStatus["status"] | "ALL"} status The status to count.
+   * @returns {number} The count of sensors.
+   */
   const getStatusCount = (status: SensorStatus["status"] | "ALL") => {
     if (status === "ALL") return sensors.length;
     return sensors.filter((s) => s.status === status).length;

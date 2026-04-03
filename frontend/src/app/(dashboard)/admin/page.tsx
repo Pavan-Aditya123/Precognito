@@ -1,3 +1,9 @@
+/**
+ * @fileoverview Admin page for managing users and viewing audit logs.
+ * Provides functionality for plant administrators to add, edit, and delete users,
+ * as well as monitor system-wide activity.
+ */
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -30,6 +36,11 @@ const roles: { value: UserRole; label: string }[] = [
   { value: "STORE_MANAGER", label: "Store Manager" },
 ];
 
+/**
+ * AdminPage component for user administration and audit trail viewing.
+ * 
+ * @returns {JSX.Element} The rendered admin page.
+ */
 export default function AdminPage() {
   const [users, setUsers] = useState<User[]>(initialUsers);
   const [auditLogs, setAuditLogs] = useState<any[]>([]);
@@ -38,6 +49,9 @@ export default function AdminPage() {
   const [newUser, setNewUser] = useState({ name: "", email: "", role: "TECHNICIAN" as UserRole });
 
   useEffect(() => {
+    /**
+     * Fetches audit logs from the API.
+     */
     async function loadAuditLogs() {
       try {
         const logs = await api.getAuditLogs();
@@ -49,6 +63,9 @@ export default function AdminPage() {
     loadAuditLogs();
   }, []);
 
+  /**
+   * Adds a new user to the system.
+   */
   const handleAddUser = () => {
     if (!newUser.name || !newUser.email) return;
     
@@ -65,10 +82,18 @@ export default function AdminPage() {
     setShowAddModal(false);
   };
 
+  /**
+   * Deletes a user from the system by ID.
+   * 
+   * @param {string} id The ID of the user to delete.
+   */
   const handleDeleteUser = (id: string) => {
     setUsers(users.filter((u) => u.id !== id));
   };
 
+  /**
+   * Updates an existing user's details.
+   */
   const handleEditUser = () => {
     if (!editingUser) return;
     setUsers(users.map((u) => (u.id === editingUser.id ? editingUser : u)));
