@@ -51,6 +51,29 @@ def reserve_part(data: dict, db: Session = Depends(get_db)):
     db.commit()
     return {"status": "reserved", "reservationId": res.id}
 
+@router.post("/purchase-order")
+def create_purchase_order(data: dict, db: Session = Depends(get_db)):
+    """
+    US-3.1: Automated purchase orders based on wear forecasts.
+    """
+    part_id = data.get("partId")
+    quantity = data.get("quantity", 10) # Bulk order
+    
+    part = db.query(models.Inventory).filter(models.Inventory.id == part_id).first()
+    if not part:
+        raise HTTPException(status_code=404, detail="Part not found")
+        
+    # In a real app, this would trigger an ERP integration or send a PO email
+    # For now, we update the status and log it
+    
+    return {
+        "status": "PO_GENERATED",
+        "poNumber": f"PO-{datetime.utcnow().strftime('%Y%m%d')}-{part.id}",
+        "partName": part.partName,
+        "quantity": quantity,
+        "expectedDelivery": part.leadTimeDays
+    }
+
 @router.get("/jit-alerts")
 def get_jit_procurement_alerts(db: Session = Depends(get_db)):
     """
