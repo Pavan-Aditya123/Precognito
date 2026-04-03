@@ -14,7 +14,11 @@ def preprocess(data: dict) -> dict:
         "vibration": ["vibration", "vib", "rotational_speed", "Rotational speed [rpm]"],
         "pressure": ["pressure", "press", "psi"],
         "torque": ["torque", "Torque [Nm]"],
-        "tool_wear": ["tool_wear", "Tool wear [min]"]
+        "tool_wear": ["tool_wear", "Tool wear [min]"],
+        # Predictive features
+        "vibration_rms": ["vibration_rms", "rms_vibration", "vibration"],
+        "freq_spike_1x": ["freq_spike_1x", "1x_spike"],
+        "freq_spike_bpfo": ["freq_spike_bpfo", "bpfo_spike"]
     }
 
     for key, aliases in mapping.items():
@@ -31,7 +35,7 @@ def preprocess(data: dict) -> dict:
                 logger.warning(f"Failed to convert {key} value: {val}")
                 processed[key] = 0.0
         else:
-            # Default values if not present (could also leave out)
+            # Default values if not present
             processed[key] = 0.0
 
     return processed

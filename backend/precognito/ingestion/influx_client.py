@@ -46,6 +46,20 @@ def save_anomaly_result(device_id: str, result: dict):
 
     write_api.write(bucket=INFLUX_BUCKET, org=INFLUX_ORG, record=point)
 
+def save_predictive_result(device_id: str, result: dict):
+    """
+    Save RUL and fault prediction results to InfluxDB
+    """
+    point = Point("predictive_results") \
+        .tag("device_id", device_id) \
+        .tag("risk_level", result.get("risk_level", "Normal")) \
+        .tag("predicted_fault_type", result.get("predicted_fault_type", "None")) \
+        .field("predicted_rul_hours", float(result.get("predicted_rul_hours", 0.0))) \
+        .field("confidence_score_percent", float(result.get("confidence_score_percent", 0.0))) \
+        .time(datetime.utcnow(), WritePrecision.NS)
+
+    write_api.write(bucket=INFLUX_BUCKET, org=INFLUX_ORG, record=point)
+
 def query_latest_data(device_id: str, measurement: str = "machine_telemetry"):
     """
     Query latest data for a device

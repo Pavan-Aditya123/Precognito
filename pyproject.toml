@@ -20,11 +20,27 @@ dependencies = [
     "paho-mqtt>=2.1.0",
     # ML/AI
     "scikit-learn>=1.6.0",
+    "xgboost>=2.1.0",
     # Utils
     "pydantic>=2.10.0",
     "python-dotenv>=1.0.0",
     "httpx>=0.28.0",
     "pytest>=9.0.2",
+]
+
+[tool.uv]
+exclude-dependencies = [
+    "nvidia-nccl-cu12", 
+    "nvidia-cuda-runtime-cu12", 
+    "nvidia-cuda-cupti-cu12", 
+    "nvidia-cudnn-cu12", 
+    "nvidia-cublas-cu12",
+    "nvidia-cuda-nvrtc-cu12",
+    "nvidia-nvjitlink-cu12",
+    "nvidia-curand-cu12",
+    "nvidia-cusolver-cu12",
+    "nvidia-cusparse-cu12",
+    "nvidia-nvtx-cu12"
 ]
 
 [project.optional-dependencies]
