@@ -148,13 +148,14 @@ export interface AuditEntry {
   id: string;
   assetId: string;
   assetName: string;
-  technicianId: string;
+  technicianId?: string;
   technicianName: string;
-  action: "CHECK_IN" | "CHECK_OUT";
+  action: string;
   timestamp: string;
   location: GeoLocation;
   qrValidated: boolean;
   workOrderId?: string;
+  mttr?: string;
 }
 
 export type ThermalSeverity = "WARNING" | "CRITICAL";

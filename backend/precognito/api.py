@@ -14,12 +14,6 @@ DATABASE_URL = os.getenv("DATABASE_URL", "postgres://precognito_user:precognito_
 
 app = FastAPI()
 
-# Include Routers
-# Module 4: Work Orders (Protected by session)
-app.include_router(workorder_router)
-# Module 3: Inventory & Supply Chain
-app.include_router(inventory_router)
-
 async def get_db_pool():
     if not hasattr(app, "db_pool"):
         app.db_pool = await asyncpg.create_pool(DATABASE_URL)
@@ -57,6 +51,30 @@ async def get_current_user(request: Request, pool = Depends(get_db_pool)):
         )
         return user
 
+class RoleChecker:
+    def __init__(self, allowed_roles: list[str]):
+        self.allowed_roles = allowed_roles
+
+    def __call__(self, user = Depends(get_current_user)):
+        if user["role"] not in self.allowed_roles:
+            raise HTTPException(
+                status_code=403, 
+                detail=f"Role '{user['role']}' does not have permission to access this resource"
+            )
+        return user
+
+# Role dependencies
+admin_only = Depends(RoleChecker(["ADMIN"]))
+manager_above = Depends(RoleChecker(["ADMIN", "MANAGER"]))
+lead_above = Depends(RoleChecker(["ADMIN", "MANAGER", "OT_SPECIALIST"]))
+store_manager_above = Depends(RoleChecker(["ADMIN", "STORE_MANAGER"]))
+
+# Include Routers
+# Module 4: Work Orders
+app.include_router(workorder_router)
+# Module 3: Inventory & Supply Chain
+app.include_router(inventory_router)
+
 async def log_audit_action(pool, user_id: str, action: str, resource: str, details: str = None):
     async with pool.acquire() as conn:
         await conn.execute(
@@ -65,7 +83,7 @@ async def log_audit_action(pool, user_id: str, action: str, resource: str, detai
         )
 
 @app.get("/audit-logs")
-async def get_audit_logs(user = Depends(get_current_user), pool = Depends(get_db_pool)):
+async def get_audit_logs(user = admin_only, pool = Depends(get_db_pool)):
     async with pool.acquire() as conn:
         rows = await conn.fetch(
             'SELECT a.*, u.name as "userName" FROM "audit_log" a JOIN "user" u ON a."userId" = u.id ORDER BY a.timestamp DESC LIMIT 100'
@@ -91,7 +109,7 @@ async def submit_model_feedback(data: dict, user = Depends(get_current_user), po
     return {"status": "success"}
 
 @app.get("/analytics/metrics")
-async def get_model_metrics(user = Depends(get_current_user), pool = Depends(get_db_pool)):
+async def get_model_metrics(user = lead_above, pool = Depends(get_db_pool)):
     async with pool.acquire() as conn:
         # Calculate metrics from feedback
         total_feedback = await conn.fetchval('SELECT COUNT(*) FROM "model_feedback"')
@@ -117,7 +135,7 @@ async def get_model_metrics(user = Depends(get_current_user), pool = Depends(get
         }
 
 @app.get("/analytics/oee")
-async def get_oee_metrics(device_id: Optional[str] = None, user = Depends(get_current_user)):
+async def get_oee_metrics(device_id: Optional[str] = None, user = manager_above):
     # Simple OEE calculation for prototype
     # In production, this would query historical data over shifts
     return {
@@ -246,7 +264,7 @@ async def get_all_alerts(range: str = "-24h", user = Depends(get_current_user)):
     return results
 
 @app.get("/safety-alerts")
-async def get_safety_alerts(range: str = "-24h", user = Depends(get_current_user)):
+async def get_safety_alerts(range: str = "-24h", user = lead_above):
     from precognito.ingestion.influx_client import INFLUX_BUCKET, INFLUX_ORG, query_api
     
     query = f'from(bucket: "{INFLUX_BUCKET}") |> range(start: {range}) |> filter(fn: (r) => r["_measurement"] == "safety_alerts") |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")'
@@ -291,7 +309,7 @@ async def ingest_data_dev(data: dict):
     }
 
 @app.get("/heartbeats")
-async def get_heartbeats():
+async def get_heartbeats(user = lead_above):
     from precognito.ingestion.heartbeat import device_status
     from datetime import datetime
     

@@ -143,12 +143,13 @@ export default function WorkOrdersPage() {
           <AuditTrailTable entries={workOrders.map(wo => ({
             id: wo.id.toString(),
             assetId: wo.assetId,
-            assetName: wo.assetId.replace("_", " "),
+            assetName: wo.assetName,
             technician: "Current User",
             action: wo.status,
             timestamp: wo.timestamp,
             location: "Main Floor",
-            status: "VERIFIED"
+            status: "VERIFIED",
+            mttr: wo.mttr
           }))} />
         </div>
       )}

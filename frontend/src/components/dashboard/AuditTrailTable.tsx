@@ -21,7 +21,7 @@ export function AuditTrailTable({ entries }: AuditTrailTableProps) {
             <th className="px-4 py-3 text-left text-[#94a3b8] font-medium">Action</th>
             <th className="px-4 py-3 text-left text-[#94a3b8] font-medium">Asset</th>
             <th className="px-4 py-3 text-left text-[#94a3b8] font-medium">Technician</th>
-            <th className="px-4 py-3 text-left text-[#94a3b8] font-medium">Location</th>
+            <th className="px-4 py-3 text-left text-[#94a3b8] font-medium">Target Window (MTTR)</th>
             <th className="px-4 py-3 text-center text-[#94a3b8] font-medium">QR Validated</th>
           </tr>
         </thead>
@@ -38,8 +38,8 @@ export function AuditTrailTable({ entries }: AuditTrailTableProps) {
               </td>
               <td className="px-4 py-3">
                 <span
-                  className={`inline-block px-2 py-0.5 rounded text-xs text-white ${
-                    entry.action === "CHECK_IN" ? "bg-[#22c55e]" : "bg-[#94a3b8]"
+                  className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold text-white ${
+                    entry.action === "CHECK_IN" ? "bg-[#22c55e]" : "bg-[#334155]"
                   }`}
                 >
                   {entry.action.replace("_", " ")}
@@ -54,16 +54,7 @@ export function AuditTrailTable({ entries }: AuditTrailTableProps) {
                 </Link>
               </td>
               <td className="px-4 py-3 text-[#94a3b8]">{entry.technicianName}</td>
-              <td className="px-4 py-3">
-                <a
-                  href={`https://maps.google.com/?q=${entry.location.lat},${entry.location.lng}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-[#3b82f6] hover:underline text-xs"
-                >
-                  {entry.location.lat.toFixed(4)}, {entry.location.lng.toFixed(4)}
-                </a>
-              </td>
+              <td className="px-4 py-3 text-[#f1f5f9] font-medium">{entry.mttr || "-"}</td>
               <td className="px-4 py-3 text-center">
                 {entry.qrValidated ? (
                   <span className="inline-flex items-center gap-1 text-[#22c55e]">
@@ -72,7 +63,7 @@ export function AuditTrailTable({ entries }: AuditTrailTableProps) {
                     </svg>
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-1 text-[#ef4444]">
+                  <span className="inline-flex items-center gap-1 text-[#64748b]">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                     </svg>

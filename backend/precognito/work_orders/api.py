@@ -20,7 +20,25 @@ def get_db():
 
 @router.get("/")
 def get_work_orders(db: Session = Depends(get_db)):
-    """Fetch all work orders (audits) from the database"""
-    # For now we'll treat 'audits' as the work order tracking table
-    results = db.query(models.Audit).order_by(models.Audit.timestamp.desc()).all()
-    return results
+    """Fetch all work orders (audits) from the database with asset metadata"""
+    # Join Audit with Asset to get name and MTTR
+    results = db.query(
+        models.Audit, 
+        models.Asset.assetName, 
+        models.Asset.mttr, 
+        models.Asset.manual
+    ).outerjoin(
+        models.Asset, 
+        models.Audit.assetId == models.Asset.assetId
+    ).order_by(models.Audit.timestamp.desc()).all()
+    
+    # Format into flat dictionary
+    output = []
+    for audit, name, mttr, manual in results:
+        d = audit.__dict__.copy()
+        d["assetName"] = name or audit.assetId
+        d["mttr"] = mttr or "Unknown"
+        d["manual"] = manual
+        output.append(d)
+        
+    return output
