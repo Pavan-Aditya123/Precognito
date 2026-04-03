@@ -2,6 +2,8 @@ from fastapi import FastAPI, Request, HTTPException, Depends
 from typing import Optional
 import asyncpg
 import os
+from datetime import datetime, timezone
+from contextlib import asynccontextmanager
 from dotenv import load_dotenv
 
 # Import routers from other modules
@@ -12,11 +14,18 @@ load_dotenv()
 
 DATABASE_URL = os.getenv("DATABASE_URL", "postgres://precognito_user:precognito_password@localhost:5432/precognito")
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup: Initialize DB Pool
+    app.db_pool = await asyncpg.create_pool(DATABASE_URL)
+    yield
+    # Shutdown: Close DB Pool
+    if hasattr(app, "db_pool"):
+        await app.db_pool.close()
+
+app = FastAPI(lifespan=lifespan)
 
 async def get_db_pool():
-    if not hasattr(app, "db_pool"):
-        app.db_pool = await asyncpg.create_pool(DATABASE_URL)
     return app.db_pool
 
 async def get_current_user(request: Request, pool = Depends(get_db_pool)):
@@ -41,7 +50,6 @@ async def get_current_user(request: Request, pool = Depends(get_db_pool)):
             raise HTTPException(status_code=401, detail="Invalid session")
             
         # Check expiry (asyncpg returns datetime)
-        from datetime import datetime, timezone
         if session["expiresAt"].replace(tzinfo=timezone.utc) < datetime.now(timezone.utc):
             raise HTTPException(status_code=401, detail="Session expired")
             
@@ -185,7 +193,7 @@ async def get_assets(user = Depends(get_current_user)):
         
         asset_info = {
             "id": d_id,
-            "name": d_id.replace("_", " ").title(),
+            "name": " ".join([s.capitalize() for s in d_id.split("_")]),
             "status": "GREEN", # Default
             "rms": 0.0,
             "rul": 0.0,
@@ -277,7 +285,7 @@ async def get_safety_alerts(range: str = "-24h", user = lead_above):
             results.append({
                 "id": f"safety-{record.get_time().timestamp()}",
                 "assetId": record.values.get("device_id"),
-                "assetName": record.values.get("device_id").replace("_", " ").title(),
+                "assetName": " ".join([s.capitalize() for s in record.values.get("device_id").split("_")]),
                 "severity": "CRITICAL",
                 "type": record.values.get("type"),
                 "currentTemp": record.values.get("temperature"),
@@ -311,11 +319,13 @@ async def ingest_data_dev(data: dict):
 @app.get("/heartbeats")
 async def get_heartbeats(user = lead_above):
     from precognito.ingestion.heartbeat import device_status
-    from datetime import datetime
     
     results = []
     for device_id, last_seen in device_status.items():
-        diff = (datetime.now() - last_seen).seconds
+        # Ensure timezone comparison works
+        now = datetime.now(timezone.utc)
+        ls = last_seen.replace(tzinfo=timezone.utc) if last_seen.tzinfo is None else last_seen
+        diff = (now - ls).seconds
         status = "Active" if diff <= 5 else "Inactive"
         results.append({
             "deviceId": device_id,
@@ -324,12 +334,3 @@ async def get_heartbeats(user = lead_above):
             "secondsSinceLast": diff
         })
     return results
-
-@app.on_event("startup")
-async def startup():
-    await get_db_pool()
-
-@app.on_event("shutdown")
-async def shutdown():
-    if hasattr(app, "db_pool"):
-        await app.db_pool.close()

@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from precognito.work_orders.database import SessionLocal
 from precognito.work_orders import models
-from datetime import datetime
+from datetime import datetime, timezone
 import logging
 
 logger = logging.getLogger(__name__)
@@ -40,7 +40,7 @@ def create_automatic_work_order(device_id: str, severity: str, reason: str):
         
         # Update technician status/last assigned
         if tech:
-            tech.lastAssigned = datetime.utcnow()
+            tech.lastAssigned = datetime.now(timezone.utc)
             # Optional: tech.status = "BUSY" 
             
         db.commit()
