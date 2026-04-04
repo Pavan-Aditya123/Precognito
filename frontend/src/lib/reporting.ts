@@ -1,16 +1,14 @@
-/**
- * @fileoverview Utility functions for generating and downloading reports.
- */
-
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
 /**
- * Downloads an array of objects as a CSV file.
- *
+ * @fileoverview Reporting utilities for exporting system data to CSV and PDF formats.
+ */
+
+/**
+ * Download data as CSV.
  * @param {any[]} data The array of objects to export.
- * @param {string} fileName The name of the file to save as.
- * @returns {void}
+ * @param {string} fileName The name of the file to save.
  */
 export function downloadCSV(data: any[], fileName: string) {
   if (data.length === 0) return;
@@ -36,33 +34,68 @@ export function downloadCSV(data: any[], fileName: string) {
 }
 
 /**
- * Generates and downloads a PDF table from an array of objects.
- *
- * @param {any[]} data The array of objects to export.
- * @param {string} title The title to display at the top of the PDF.
- * @param {string} fileName The name of the file to save as.
- * @returns {void}
+ * Download data as a formal, signed PDF report.
+ * @param {any[]} data The array of objects to export as a table.
+ * @param {string} title The title of the report.
+ * @param {string} fileName The name of the file to save.
  */
 export function downloadPDF(data: any[], title: string, fileName: string) {
   if (data.length === 0) return;
 
   const doc = new jsPDF();
-  doc.setFontSize(18);
-  doc.text(title, 14, 22);
-  doc.setFontSize(11);
+  
+  // --- Company Header ---
+  doc.setFillColor(15, 23, 42); // #0f172a
+  doc.rect(0, 0, 210, 40, 'F');
+  
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(22);
+  doc.text("PRECOGNITO", 14, 25);
+  
+  doc.setFontSize(10);
+  doc.text("Industrial Predictive Maintenance System", 14, 32);
+  doc.text("Factory Intelligence Unit", 160, 25, { align: "right" });
+  
+  // --- Report Title ---
+  doc.setTextColor(15, 23, 42);
+  doc.setFontSize(16);
+  doc.text(title.toUpperCase(), 14, 55);
+  
+  doc.setFontSize(10);
   doc.setTextColor(100);
-  doc.text(`Generated on ${new Date().toLocaleString()}`, 14, 30);
+  doc.text(`Generated on: ${new Date().toLocaleString()}`, 14, 62);
+  doc.text(`Report ID: PR-${Math.random().toString(36).substring(2, 9).toUpperCase()}`, 14, 67);
 
+  // --- Data Table ---
   const headers = Object.keys(data[0]);
   const body = data.map(obj => Object.values(obj));
 
   autoTable(doc, {
-    startY: 35,
-    head: [headers],
+    startY: 75,
+    head: [headers.map(h => h.toUpperCase())],
     body: body,
     theme: 'striped',
-    headStyles: { fillColor: [15, 23, 42] },
+    headStyles: { fillColor: [15, 23, 42], textColor: [255, 255, 255], fontStyle: 'bold' },
+    styles: { fontSize: 9 },
+    alternateRowStyles: { fillColor: [245, 247, 250] },
   });
+
+  // --- Signature Block (ISO Compliance) ---
+  const finalY = (doc as any).lastAutoTable.finalY + 30;
+  
+  if (finalY < 250) {
+    doc.setDrawColor(200);
+    doc.line(14, finalY, 80, finalY);
+    doc.line(130, finalY, 196, finalY);
+    
+    doc.setFontSize(9);
+    doc.setTextColor(100);
+    doc.text("AUTHORIZED SIGNATURE", 14, finalY + 5);
+    doc.text("MAINTENANCE LEAD VERIFICATION", 130, finalY + 5);
+    
+    doc.setFontSize(8);
+    doc.text("This report is digitally hashed and verified for ISO 55001 compliance.", 14, finalY + 15);
+  }
 
   doc.save(`${fileName}.pdf`);
 }

@@ -1,11 +1,11 @@
-/**
- * @fileoverview Root layout component for the entire Next.js application.
- * This module defines the HTML structure, global styles, metadata, 
- * and viewport configurations for all pages.
- */
-
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import { ThemeProvider } from "@/lib/ThemeContext";
+
+/**
+ * @fileoverview Root Layout for the Precognito application.
+ * Handles global providers, metadata, and viewport settings.
+ */
 
 export const metadata: Metadata = {
   title: "Precognito - Predictive Maintenance",
@@ -31,10 +31,8 @@ export const viewport: Viewport = {
 };
 
 /**
- * RootLayout component that serves as the top-level wrapper for all pages.
- * 
- * @param {Object} props Component properties.
- * @param {React.ReactNode} props.children The content to be rendered within the layout.
+ * RootLayout component wrapping the entire application.
+ * @param {Readonly<{children: React.ReactNode}>} props Component props.
  * @returns {JSX.Element} The rendered root layout.
  */
 export default function RootLayout({
@@ -54,7 +52,7 @@ export default function RootLayout({
         <meta name="msapplication-tap-highlight" content="no" />
       </head>
       <body className="h-full antialiased">
-        {children}
+        <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
   );

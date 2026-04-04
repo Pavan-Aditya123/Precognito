@@ -1,9 +1,9 @@
 """
 SQLAlchemy models for assets, audits, and technician rosters.
 """
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Text, Numeric
 from precognito.work_orders.database import Base
-from datetime import datetime
+from datetime import datetime, timezone
 
 class Asset(Base):
     """Represents an industrial asset or machine.
@@ -33,6 +33,11 @@ class Audit(Base):
         remarks (str): Description or notes about the maintenance activity.
         timestamp (datetime): When the audit record was created.
         assignedTo (str): ID of the technician assigned to the task.
+        resolution (str): Notes on how the issue was resolved.
+        partId (int): ID of the spare part used from inventory.
+        quantityUsed (int): Number of parts used.
+        actualCost (float): Total cost of the repair (Labor + Parts).
+        completedAt (datetime): When the task was finalized.
     """
     __tablename__ = "audits"
 
@@ -40,8 +45,15 @@ class Audit(Base):
     assetId = Column(String, index=True)
     status = Column(String)
     remarks = Column(String)
-    timestamp = Column(DateTime, default=datetime.utcnow)
-    assignedTo = Column(String, index=True) # User ID of technician
+    timestamp = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    assignedTo = Column(String, index=True)
+    
+    # New lifecycle and cost fields
+    resolution = Column(Text)
+    partId = Column(Integer)
+    quantityUsed = Column(Integer, default=0)
+    actualCost = Column(Numeric(10, 2), default=0.00)
+    completedAt = Column(DateTime)
 
 class Roster(Base):
     """Represents a technician's availability and skill set.

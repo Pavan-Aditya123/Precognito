@@ -154,4 +154,7 @@ export const api = {
    */
   reservePart: (data: { partId: number, workOrderId?: number, quantity: number }) => 
     fetchWithAuth("/inventory/reserve", { method: "POST", body: JSON.stringify(data) }),
+  getRecommendations: (period: string = "monthly", machineId?: string) => 
+    fetchWithAuth(`/admin-reporting/recommendations?period=${period}${machineId ? `&machine_id=${machineId}` : ""}`),
+  getSystemHealth: () => fetchWithAuth("/admin-reporting/health"),
 };
