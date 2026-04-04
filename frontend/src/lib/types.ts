@@ -94,14 +94,22 @@ export interface HealthTrend {
   critical: number;
 }
 
-/** Represents a frequency bin in a vibration FFT analysis. */
+/** Represents a point in a vibration FFT analysis. */
 export interface FFTBin {
   /** Frequency in Hz. */
   frequency: number;
   /** Current amplitude value. */
   amplitude: number;
   /** Historical baseline amplitude for comparison. */
-  baselineAmplitude: number;
+  baselineAmplitude?: number;
+}
+
+/** Represents a point in a live telemetry stream. */
+export interface SensorDataPoint {
+  /** X-axis value (frequency or time). */
+  frequency: number;
+  /** Intensity value (amplitude or vibration). */
+  amplitude: number;
 }
 
 /** Represents a historical RUL prediction data point. */
@@ -117,11 +125,13 @@ export interface RULTrendPoint {
 /** Represents a specific fault type prediction. */
 export interface FaultPrediction {
   /** Type of fault detected (e.g., Bearing Failure). */
-  faultType: string;
+  type: string;
   /** Probability of this fault type (0-1). */
   confidence: number;
-  /** Detailed description of the fault and symptoms. */
-  description: string;
+  /** ISO timestamp of the prediction. */
+  timestamp: string;
+  /** Recommended action. */
+  recommendation: string;
 }
 
 /** Possible availability statuses for spare parts. */
@@ -226,6 +236,8 @@ export interface ModelMetrics {
   recall: number;
   /** F1 score (0-1). */
   f1Score: number;
+  /** Overall accuracy (0-1). */
+  accuracy: number;
   /** False Discovery Rate (0-1). */
   fdr: number;
 }

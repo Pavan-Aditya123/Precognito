@@ -234,12 +234,12 @@ function generateRULTrend(assetId: string): RULTrendPoint[] {
 }
 
 export const mockFaultPredictions: Record<string, FaultPrediction> = {
-  "AST-001": { faultType: "Normal Operation", confidence: 92, description: "Machine operating within normal parameters" },
-  "AST-002": { faultType: "Bearing Wear", confidence: 78, description: "Degradation detected in front bearing assembly" },
-  "AST-003": { faultType: "Rotor Imbalance", confidence: 89, description: "Significant imbalance detected, immediate attention required" },
-  "AST-004": { faultType: "Normal Operation", confidence: 94, description: "Machine operating within normal parameters" },
-  "AST-005": { faultType: "Misalignment", confidence: 72, description: "Shaft misalignment suspected based on vibration pattern" },
-  "AST-006": { faultType: "Normal Operation", confidence: 96, description: "Machine operating within normal parameters" },
+  "AST-001": { type: "Normal Operation", confidence: 92, timestamp: new Date().toISOString(), recommendation: "Machine operating within normal parameters" },
+  "AST-002": { type: "Bearing Wear", confidence: 78, timestamp: new Date().toISOString(), recommendation: "Degradation detected in front bearing assembly" },
+  "AST-003": { type: "Rotor Imbalance", confidence: 89, timestamp: new Date().toISOString(), recommendation: "Significant imbalance detected, immediate attention required" },
+  "AST-004": { type: "Normal Operation", confidence: 94, timestamp: new Date().toISOString(), recommendation: "Machine operating within normal parameters" },
+  "AST-005": { type: "Misalignment", confidence: 72, timestamp: new Date().toISOString(), recommendation: "Shaft misalignment suspected based on vibration pattern" },
+  "AST-006": { type: "Normal Operation", confidence: 96, timestamp: new Date().toISOString(), recommendation: "Machine operating within normal parameters" },
 };
 
 export const mockFFTData: Record<string, FFTBin[]> = {};
@@ -344,6 +344,7 @@ function generateModelMetrics(): ModelMetrics[] {
       precision: Math.round(precision * 1000) / 10,
       recall: Math.round(recall * 1000) / 10,
       f1Score: Math.round(f1Score * 1000) / 10,
+      accuracy: Math.round(((truePositives + trueNegatives) / total) * 1000) / 10,
       fdr: Math.round(fdr * 1000) / 10,
     });
   }

@@ -9,7 +9,7 @@ describe("Visual Snapshots", () => {
       id: "motor_1",
       name: "Motor 1",
       status: "GREEN",
-      lastUpdate: "2026-04-04T12:00:00Z",
+      lastUpdated: "2026-04-04T12:00:00Z",
       type: "motor",
       location: "Factory Floor A",
       rms: 0.05,

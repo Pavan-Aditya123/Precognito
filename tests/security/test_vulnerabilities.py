@@ -7,9 +7,11 @@ async def test_sql_injection_attempt(auth_client: AsyncClient):
     """
     Test for SQL injection vulnerability on an endpoint that takes string input.
     """
+    import random
+    rand_id = random.randint(10000, 99999)
     # SQL Injection payload in assetId
     payload = {
-        "assetId": "PUMP_SQLI'; DROP TABLE assets; --",
+        "assetId": f"PUMP_SQLI_{rand_id}'; DROP TABLE assets; --",
         "assetName": "Malicious Pump",
         "assetType": "pump"
     }

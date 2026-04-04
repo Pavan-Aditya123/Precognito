@@ -3,7 +3,7 @@ SQLAlchemy models for inventory management and part reservations.
 """
 from sqlalchemy import Column, Integer, String, DateTime, Numeric, ForeignKey
 from precognito.work_orders.database import Base
-from datetime import datetime
+from datetime import datetime, timezone
 
 class Inventory(Base):
     """Represents a spare part or consumable in the inventory.
@@ -29,7 +29,7 @@ class Inventory(Base):
     leadTimeDays = Column(Integer, default=7)
     costPerUnit = Column(Numeric(10, 2), default=0.00)
     category = Column(String)
-    lastRestocked = Column(DateTime, default=datetime.utcnow)
+    lastRestocked = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
 class PartReservation(Base):
     """Represents a reservation of parts for a specific work order.
@@ -49,4 +49,4 @@ class PartReservation(Base):
     workOrderId = Column(Integer)
     quantity = Column(Integer, nullable=False)
     status = Column(String, default="RESERVED")
-    timestamp = Column(DateTime, default=datetime.utcnow)
+    timestamp = Column(DateTime, default=lambda: datetime.now(timezone.utc))

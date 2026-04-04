@@ -10,7 +10,7 @@ vi.mock('./auth-client', () => ({
 }));
 
 // Mock global fetch
-global.fetch = vi.fn();
+global.fetch = vi.fn() as any;
 
 describe('api utility', () => {
   beforeEach(() => {

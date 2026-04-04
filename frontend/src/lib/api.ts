@@ -157,4 +157,45 @@ export const api = {
   getRecommendations: (period: string = "monthly", machineId?: string) => 
     fetchWithAuth(`/admin-reporting/recommendations?period=${period}${machineId ? `&machine_id=${machineId}` : ""}`),
   getSystemHealth: () => fetchWithAuth("/admin-reporting/health"),
+  /**
+   * Fetches device heartbeats.
+   *
+   * @returns {Promise<any>} List of device heartbeats.
+   */
+  getHeartbeats: () => fetchWithAuth("/heartbeats"),
+
+  /**
+   * Fetches all work orders.
+   *
+   * @returns {Promise<any>} List of work orders.
+   */
+  getWorkOrders: () => fetchWithAuth("/work-orders"),
+
+  /**
+   * Creates a new asset.
+   *
+   * @param {Object} data Asset data.
+   * @returns {Promise<any>} The created asset.
+   */
+  createAsset: (data: any) => 
+    fetchWithAuth("/work-orders/assets/", { method: "POST", body: JSON.stringify(data) }),
+
+  /**
+   * Creates a new audit (work order).
+   *
+   * @param {Object} data Audit data.
+   * @returns {Promise<any>} The created audit.
+   */
+  createAudit: (data: any) => 
+    fetchWithAuth("/work-orders/audit/", { method: "POST", body: JSON.stringify(data) }),
+
+  /**
+   * Completes a work order.
+   *
+   * @param {number} id The work order ID.
+   * @param {Object} data Completion data.
+   * @returns {Promise<any>} The result.
+   */
+  completeWorkOrder: (id: number, data: any) => 
+    fetchWithAuth(`/work-orders/audit/${id}/complete`, { method: "PATCH", body: JSON.stringify(data) }),
 };

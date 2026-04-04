@@ -60,3 +60,10 @@ Welcome to the **Precognito** Predictive Maintenance System. This guide provides
 
 ## 🌗 UI Customization
 - If working in high-glare or low-light factory conditions, use the **Theme Toggle** (Sun/Moon icon) in the top header to switch between **Dark Mode** and **High-Contrast Light Mode**.
+
+---
+
+## 📚 Technical Documentation
+For deployment instructions, API references, and system administration, please refer to the following documents in the `docs/` folder:
+- **[Administrator & Deployment Guide](docs/ADMIN_GUIDE.md)**
+- **[API Reference Guide](docs/API_REFERENCE.md)**

@@ -18,7 +18,7 @@ interface FaultBadgeProps {
  * @returns {JSX.Element} The rendered fault badge.
  */
 export function FaultBadge({ prediction }: FaultBadgeProps) {
-  const isNormal = prediction.faultType === "Normal Operation";
+  const isNormal = prediction.type === "Normal Operation";
   const statusColor = isNormal 
     ? "bg-[#22c55e]/20 text-[#22c55e]" 
     : "bg-[#ef4444]/20 text-[#ef4444]";
@@ -27,13 +27,13 @@ export function FaultBadge({ prediction }: FaultBadgeProps) {
     <div className="space-y-2">
       <div className="flex items-center gap-3">
         <span className={`px-3 py-1.5 rounded-full text-sm font-medium ${statusColor}`}>
-          {prediction.faultType}
+          {prediction.type}
         </span>
         <span className="text-sm text-[#94a3b8]">
-          {prediction.confidence}% confidence
+          {(prediction.confidence * 100).toFixed(1)}% confidence
         </span>
       </div>
-      <p className="text-sm text-[#94a3b8]">{prediction.description}</p>
+      <p className="text-sm text-[#94a3b8]">{prediction.recommendation}</p>
     </div>
   );
 }

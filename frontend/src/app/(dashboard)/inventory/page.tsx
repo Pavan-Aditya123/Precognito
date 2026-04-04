@@ -50,7 +50,7 @@ export default function InventoryPage() {
   const lowStockParts = spareParts.filter((p) => p.status === "LOW_STOCK" || p.status === "OUT_OF_STOCK");
   const activeWorkOrders = workOrders.filter((wo) => wo.status !== "COMPLETED" && wo.status !== "CANCELLED");
 
-  // Map backend parts to the format expected by components if different
+  // Map backend parts to the format expected by components
   const mappedParts = spareParts.map(p => ({
     id: p.id.toString(),
     name: p.partName,
@@ -59,6 +59,9 @@ export default function InventoryPage() {
     reorderPoint: p.minThreshold,
     status: p.status,
     leadTime: `${p.leadTimeDays} days`,
+    leadTimeDays: p.leadTimeDays,
+    unitCost: p.costPerUnit,
+    supplier: "System Default", // Backend currently doesn't provide supplier
     category: p.category
   }));
 

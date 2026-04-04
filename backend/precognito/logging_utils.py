@@ -1,11 +1,11 @@
 import logging
 import sys
-from pythonjsonlogger import jsonlogger
+from pythonjsonlogger import json
 
 def setup_logging():
     """Sets up structured JSON logging for the application."""
     handler = logging.StreamHandler(sys.stdout)
-    formatter = jsonlogger.JsonFormatter(
+    formatter = json.JsonFormatter(
         '%(asctime)s %(levelname)s %(name)s %(message)s'
     )
     handler.setFormatter(formatter)

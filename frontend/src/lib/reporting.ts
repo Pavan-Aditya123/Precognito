@@ -68,7 +68,7 @@ export function downloadPDF(data: any[], title: string, fileName: string) {
 
   // --- Data Table ---
   const headers = Object.keys(data[0]);
-  const body = data.map(obj => Object.values(obj));
+  const body = data.map(obj => Object.values(obj)) as any[][];
 
   autoTable(doc, {
     startY: 75,

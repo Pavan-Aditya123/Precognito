@@ -74,3 +74,6 @@ async def test_feedback_loop_integration(auth_client: AsyncClient, mocker):
     assert data["falsePositives"] == 2
     assert data["trueNegatives"] == 10000 - (5 + 2)
     assert "precision" in data
+    assert "accuracy" in data
+    assert "fdr" in data
+    assert data["accuracy"] > 0

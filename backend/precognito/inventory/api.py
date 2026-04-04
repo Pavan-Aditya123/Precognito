@@ -4,7 +4,7 @@ API router for inventory management and JIT procurement alerts.
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
-from datetime import datetime
+from datetime import datetime, timezone
 from precognito.work_orders.database import SessionLocal
 from precognito.inventory import models
 from precognito.ingestion.influx_client import query_latest_data
@@ -115,7 +115,7 @@ def create_purchase_order(request: PurchaseOrderRequest, db: Session = Depends(g
     
     return {
         "status": "PO_GENERATED",
-        "poNumber": f"PO-{datetime.utcnow().strftime('%Y%m%d')}-{part.id}",
+        "poNumber": f"PO-{datetime.now(timezone.utc).strftime('%Y%m%d')}-{part.id}",
         "partName": part.partName,
         "quantity": quantity,
         "expectedDelivery": part.leadTimeDays

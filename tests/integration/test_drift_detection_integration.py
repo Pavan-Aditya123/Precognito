@@ -39,8 +39,8 @@ async def test_drift_detector_calculation(mocker):
     # Error = |48 - 24| = 24h.
     # This should be logged as MAE = 24.
     
-    with mocker.patch("logging.Logger.warning") as mock_log:
-        detect_drift()
-        # MAE is 24, which is our threshold. It might trigger or not depending on >= vs >.
-        # But let's verify it didn't crash and processed the event.
-        assert mock_query.called
+    mocker.patch("logging.Logger.warning")
+    detect_drift()
+    # MAE is 24, which is our threshold. It might trigger or not depending on >= vs >.
+    # But let's verify it didn't crash and processed the event.
+    assert mock_query.called

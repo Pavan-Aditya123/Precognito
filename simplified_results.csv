@@ -1,0 +1,11 @@
+machine_id,timestamp,anomaly_detected,severity,confidence,reason,temperature,vibration,torque
+M1,2026-04-04T22:09:50.254018,True,MODERATE,0.02803519336147231,Threshold-based detection,305.0,1500.0,45.0
+M1,2026-04-04T22:09:50.273972,True,HIGH,0.8,Threshold-based detection,307.0,1520.0,44.0
+M1,2026-04-04T22:09:50.292510,True,HIGH,0.8,Threshold-based detection,306.5,1510.0,45.5
+M1,2026-04-04T22:09:50.307721,True,HIGH,0.8,Threshold-based detection,450.0,1500.0,45.0
+M2,2026-04-04T22:09:50.322764,True,HIGH,0.8,Threshold-based detection,308.0,1490.0,46.0
+M2,2026-04-04T22:09:50.336867,True,HIGH,0.8,Threshold-based detection,310.0,1510.0,47.0
+M2,2026-04-04T22:09:50.351698,True,HIGH,1.0,Spike: torque=45.00 deviates 7.67σ from mean 46.15; Threshold-based detection,250.0,1500.0,45.0
+M3,2026-04-04T22:09:50.365734,True,HIGH,0.8,Threshold-based detection,305.0,3000.0,45.0
+M4,2026-04-04T22:09:50.379903,True,HIGH,0.8,Threshold-based detection,400.0,2500.0,80.0
+M5,2026-04-04T22:09:50.400557,True,HIGH,0.8,Threshold-based detection,500.0,3500.0,100.0

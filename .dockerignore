@@ -1,0 +1,27 @@
+# Dependency artifacts
+**/__pycache__
+**/.pytest_cache
+**/.ruff_cache
+**/.venv
+**/node_modules
+**/out
+**/.next
+**/.devenv
+
+# Database and secrets
+*.sqlite
+*.sqlite-journal
+.env
+.env.local
+
+# Git
+.git
+.github
+.gitignore
+
+# Documentation and plans
+.plan
+AUDIT_REPORT.md
+AUDIT_REVIEW.md
+USER_MANUAL.md
+docs/

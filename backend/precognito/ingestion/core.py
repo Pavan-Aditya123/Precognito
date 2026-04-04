@@ -79,13 +79,13 @@ def process_ingestion(device_id: str, raw_data: dict):
         if is_sustained_thermal:
             from influxdb_client import Point, WritePrecision
             from precognito.ingestion.influx_client import write_api, INFLUX_BUCKET, INFLUX_ORG
-            from datetime import datetime
+            from datetime import datetime, timezone
             point = Point("safety_alerts") \
                 .tag("device_id", device_id) \
                 .tag("type", "sustained_thermal") \
                 .field("temperature", float(processed.get("temperature", 0.0))) \
                 .field("active", True) \
-                .time(datetime.utcnow(), WritePrecision.NS)
+                .time(datetime.now(timezone.utc), WritePrecision.NS)
             write_api.write(bucket=INFLUX_BUCKET, org=INFLUX_ORG, record=point)
             
     except Exception as e:

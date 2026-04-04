@@ -194,14 +194,21 @@ async def get_model_metrics(user = lead_above, pool = Depends(get_db_pool)):
         precision = true_positives / (true_positives + false_positives) if (true_positives + false_positives) > 0 else 0
         recall = true_positives / (true_positives + false_negatives) if (true_positives + false_negatives) > 0 else 0
         
+        total_predictions = true_positives + false_positives + true_negatives + false_negatives
+        accuracy = (true_positives + true_negatives) / total_predictions if total_predictions > 0 else 0
+        fdr = false_positives / (true_positives + false_positives) if (true_positives + false_positives) > 0 else 0
+
         return {
             "precision": round(precision, 2),
             "recall": round(recall, 2),
             "f1Score": round(2 * (precision * recall) / (precision + recall), 2) if (precision + recall) > 0 else 0,
+            "accuracy": round(accuracy * 100, 1),
+            "fdr": round(fdr * 100, 1),
             "truePositives": true_positives,
             "falsePositives": false_positives,
             "trueNegatives": true_negatives,
-            "falseNegatives": false_negatives
+            "falseNegatives": false_negatives,
+            "period": "Last 30 Days"
         }
 
 @app.get("/assets")

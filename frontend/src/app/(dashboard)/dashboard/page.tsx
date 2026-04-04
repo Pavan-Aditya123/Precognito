@@ -65,8 +65,7 @@ export default function DashboardPage() {
   }
 
   const user = session.user;
-  // @ts-ignore
-  const role = user.role || "TECHNICIAN";
+  const role = ((user as any).role || "TECHNICIAN") as UserRole;
   const allowedPages = rolePermissions[role] || [];
   
   const stats = {

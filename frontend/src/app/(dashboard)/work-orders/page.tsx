@@ -8,7 +8,7 @@
 
 import { useEffect, useState } from "react";
 import { mockAssetDocumentation } from "@/lib/mockData";
-import { DocumentationPanel } from "@/components/documentation/DocumentationPanel";
+import { DocumentationPanel } from "@/components/dashboard/DocumentationPanel";
 import { QRScanner } from "@/components/dashboard/QRScanner";
 import { AuditTrailTable } from "@/components/dashboard/AuditTrailTable";
 import { api } from "@/lib/api";
@@ -41,9 +41,10 @@ export default function WorkOrdersPage() {
   const loadData = async () => {
     try {
       const [woData, invData] = await Promise.all([
-        api.fetchWithAuth("/work-orders"),
+        api.getWorkOrders(),
         api.getInventory()
       ]);
+
       setWorkOrders(woData || []);
       setInventory(invData || []);
     } catch (err) {
@@ -66,13 +67,10 @@ export default function WorkOrdersPage() {
     const assetId = data.toUpperCase();
     
     try {
-      await api.fetchWithAuth("/work-orders/audit/", {
-        method: "POST",
-        body: JSON.stringify({
-          assetId: assetId,
-          status: "CHECK_IN",
-          remarks: "Check-in Verified"
-        })
+      await api.createAudit({
+        assetId: assetId,
+        status: "CHECK_IN",
+        remarks: "Check-in Verified"
       });
       
       setSelectedAsset(assetId);
@@ -89,14 +87,11 @@ export default function WorkOrdersPage() {
     if (!completingTask) return;
     
     try {
-      await api.fetchWithAuth(`/work-orders/audit/${completingTask.id}/complete`, {
-        method: "PATCH",
-        body: JSON.stringify({
-          resolution,
-          partId: selectedPart ? parseInt(selectedPart) : null,
-          quantityUsed: partQty,
-          laborHours: laborHours
-        })
+      await api.completeWorkOrder(completingTask.id, {
+        resolution,
+        partId: selectedPart ? parseInt(selectedPart) : null,
+        quantityUsed: partQty,
+        laborHours: laborHours
       });
       
       setCompletingTask(null);

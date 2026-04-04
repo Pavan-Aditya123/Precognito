@@ -24,8 +24,7 @@ export default function EdgePage() {
      */
     async function loadHeartbeats() {
       try {
-        // We'll use fetchWithAuth directly or add a new method to api
-        const data = await api.fetchWithAuth("/heartbeats");
+        const data = await api.getHeartbeats();
         
         // Map backend heartbeats to SensorStatus type
         const mappedSensors: SensorStatus[] = data.map((hb: any) => ({

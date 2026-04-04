@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  backend-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        run: uv python install
+
+      - name: Install dependencies
+        run: uv sync --all-extras --dev
+
+      - name: Run Linting (Ruff)
+        run: uv run ruff check .
+
+      - name: Run Backend Tests
+        run: |
+          export PYTHONPATH=$PYTHONPATH:$(pwd)/backend
+          uv run pytest tests/unit tests/integration tests/security tests/contract tests/smoke
+        env:
+          DATABASE_URL: sqlite:///./test_precognito.sqlite
+          INFLUX_URL: http://localhost:8086
+          INFLUX_TOKEN: test_token
+          INFLUX_ORG: test_org
+          INFLUX_BUCKET: test_bucket
+          MQTT_BROKER: localhost
+          BETTER_AUTH_SECRET: test_secret
+
+  frontend-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        working-directory: ./frontend
+        run: bun install
+
+      - name: Run Frontend Tests
+        working-directory: ./frontend
+        run: bun run test

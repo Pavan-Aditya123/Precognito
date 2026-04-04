@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useSession, signOut } from "@/lib/auth-client";
 import { api } from "@/lib/api";
 import { NotificationBell } from "./NotificationBell";
-import { roleColors } from "@/lib/constants";
+import { roleColors, UserRole } from "@/lib/constants";
 import { useTheme } from "@/lib/ThemeContext";
 
 /**
@@ -32,8 +32,7 @@ export function Header() {
 
   if (!user) return null;
 
-  // @ts-ignore
-  const role = user.role || "TECHNICIAN";
+  const role = ((user as any).role || "TECHNICIAN") as UserRole;
 
   return (
     <header
@@ -70,7 +69,7 @@ export function Header() {
             onClick={() => setShowDropdown(!showDropdown)}
             className="flex items-center gap-2 p-2 rounded-lg hover:bg-[#1e293b] transition-colors"
           >
-            <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium" style={{ backgroundColor: roleColors[role as any] || "#3b82f6" }}>
+            <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium" style={{ backgroundColor: roleColors[role] || "#3b82f6" }}>
               {user.name.charAt(0).toUpperCase()}
             </div>
             <div className="text-left hidden sm:block">

@@ -3,7 +3,7 @@ InfluxDB client module for saving and querying sensor telemetry and analysis res
 """
 import os
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from influxdb_client import InfluxDBClient, Point, WritePrecision
 from influxdb_client.client.write_api import WriteOptions
 from dotenv import load_dotenv
@@ -40,7 +40,7 @@ def save_sensor_data(device_id: str, data: dict):
     """Saves raw sensor data to InfluxDB."""
     point = Point("machine_telemetry") \
         .tag("device_id", device_id) \
-        .time(datetime.utcnow(), WritePrecision.NS)
+        .time(datetime.now(timezone.utc), WritePrecision.NS)
 
     for key, value in data.items():
         if isinstance(value, (int, float)):
@@ -59,7 +59,7 @@ def save_anomaly_result(device_id: str, result: dict):
         .field("anomaly_detected", bool(result.get("anomaly_detected", False))) \
         .field("confidence", float(result.get("confidence", 0.0))) \
         .field("reason", str(result.get("reason", ""))) \
-        .time(datetime.utcnow(), WritePrecision.NS)
+        .time(datetime.now(timezone.utc), WritePrecision.NS)
 
     write_api.write(bucket=INFLUX_BUCKET, org=INFLUX_ORG, record=point)
 
@@ -72,7 +72,7 @@ def save_predictive_result(device_id: str, result: dict):
         .tag("predicted_fault_type", result.get("predicted_fault_type", "None")) \
         .field("predicted_rul_hours", float(result.get("predicted_rul_hours", 0.0))) \
         .field("confidence_score_percent", float(result.get("confidence_score_percent", 0.0))) \
-        .time(datetime.utcnow(), WritePrecision.NS)
+        .time(datetime.now(timezone.utc), WritePrecision.NS)
 
     write_api.write(bucket=INFLUX_BUCKET, org=INFLUX_ORG, record=point)
 

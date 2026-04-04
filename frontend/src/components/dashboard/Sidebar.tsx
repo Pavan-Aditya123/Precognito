@@ -34,8 +34,7 @@ export function Sidebar() {
   const { data: session } = useSession();
   const user = session?.user;
 
-  // @ts-ignore - custom role field
-  const role = user?.role || "TECHNICIAN";
+  const role = ((user as any)?.role || "TECHNICIAN") as UserRole;
   const allowedPages = rolePermissions[role] || [];
   
   const navItems = allNavItems.filter(

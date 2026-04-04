@@ -134,7 +134,7 @@ export default function ExecutivePage() {
                   <p className="font-semibold text-[#f1f5f9]">${rec.final_cost.toLocaleString()}</p>
                 </div>
                 <div>
-                  <p className-[#94a3b8] text-xs">Failure Prob.</p>
+                  <p className="text-[#94a3b8] text-xs">Failure Prob.</p>
                   <p className={`font-semibold ${rec.failure_probability > 0.5 ? 'text-[#ef4444]' : 'text-[#22c55e]'}`}>
                     {(rec.failure_probability * 100).toFixed(1)}%
                   </p>
