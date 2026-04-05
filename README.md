@@ -34,7 +34,14 @@ precognito/
 
 ## Getting Started (Team Quick Start)
 
-### 1. Unified Setup (Docker)
+### 1. The "One Command" Developer Mode (Recommended)
+This starts the Docker infrastructure, the Backend, the Frontend, and the Simulator all in one terminal window:
+```bash
+uv run python start_all.py
+```
+*Press `Ctrl+C` to stop all services at once.*
+
+### 2. Unified Setup (Docker)
 The entire stack (Postgres, InfluxDB, Mosquitto, API, and Frontend) can be started with a single command:
 ```bash
 docker compose up --build -d
