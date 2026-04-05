@@ -3,6 +3,19 @@ import pandas as pd
 import numpy as np
 
 def generate_telemetry_data(num_machines=50, max_cycles=1000):
+    """Generates a synthetic telemetry dataset for machine learning training.
+
+    Creates vibration, temperature, and frequency spike data for multiple machines
+    simulating degradation over their lifecycle until failure.
+
+    Args:
+        num_machines: The number of machines to simulate. Defaults to 50.
+        max_cycles: The maximum number of cycles (hours) a machine can last.
+            Defaults to 1000.
+
+    Returns:
+        None. The generated data is saved to 'data/telemetry_dataset.csv'.
+    """
     np.random.seed(42)
     data = []
     

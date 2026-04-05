@@ -32,6 +32,11 @@ latest_prediction = {
 }
 
 def get_engine():
+    """Lazily initializes and retrieves the PredictiveInferenceEngine instance.
+
+    Returns:
+        The PredictiveInferenceEngine instance if successfully loaded, otherwise None.
+    """
     global engine
     if engine is None:
         try:
@@ -49,11 +54,26 @@ def get_engine():
 
 @app.on_event("startup")
 async def startup_event():
+    """Initializes the backend components on startup.
+
+    This includes loading the inference engine and printing a startup message.
+    """
     get_engine()
     print("Precognito Modular Backend Started.")
 
 @app.post("/predict/rul")
 async def predict_rul(data: TelemetryPayload):
+    """Predicts machine health status based on telemetry data.
+
+    Args:
+        data: A TelemetryPayload object containing machine telemetry values.
+
+    Returns:
+        A dictionary with the machine ID and prediction results.
+
+    Raises:
+        HTTPException: If the ML models are not found or loaded.
+    """
     current_engine = get_engine()
     if not current_engine:
         raise HTTPException(status_code=503, detail="ML Models not found. Ensure /models folder is correctly placed.")
@@ -85,9 +105,18 @@ async def predict_rul(data: TelemetryPayload):
 
 @app.get("/api/predict")
 async def get_latest_prediction():
-    """Retrieve the most recent prediction across all machines."""
+    """Retrieve the most recent prediction across all machines.
+
+    Returns:
+        A dictionary containing the latest prediction data.
+    """
     return latest_prediction
 
 @app.get("/health")
 async def health_check():
+    """Returns the health status of the application.
+
+    Returns:
+        A dictionary indicating if the service is online and the engine is loaded.
+    """
     return {"status": "online", "engine_loaded": engine is not None}

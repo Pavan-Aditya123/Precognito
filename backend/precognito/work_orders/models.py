@@ -77,7 +77,16 @@ class Roster(Base):
     lastAssigned = Column(DateTime)
 
 class AuditLog(Base):
-    """Represents a system-wide audit log entry for user actions."""
+    """Represents a system-wide audit log entry for user actions.
+
+    Attributes:
+        id (int): Primary key.
+        userId (str): ID of the user who performed the action.
+        action (str): Description of the action (e.g., CREATE, UPDATE).
+        resource (str): The system resource affected by the action.
+        details (str): JSON or text details of the action.
+        timestamp (datetime): When the action occurred.
+    """
     __tablename__ = "audit_log"
 
     id = Column(Integer, primary_key=True, index=True)

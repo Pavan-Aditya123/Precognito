@@ -5,8 +5,22 @@ from functools import wraps
 logger = logging.getLogger(__name__)
 
 class CircuitBreaker:
-    """Simple circuit breaker implementation to prevent cascading failures."""
+    """Simple circuit breaker implementation to prevent cascading failures.
+
+    Attributes:
+        failure_threshold: Number of failures before tripping the circuit.
+        recovery_timeout: Time in seconds to wait before attempting recovery.
+        failure_count: Current count of consecutive failures.
+        last_failure_time: Timestamp of the last failure.
+        state: Current state of the circuit breaker (CLOSED, OPEN, HALF-OPEN).
+    """
     def __init__(self, failure_threshold=5, recovery_timeout=30):
+        """Initializes the CircuitBreaker.
+
+        Args:
+            failure_threshold: Number of failures before tripping. Defaults to 5.
+            recovery_timeout: Seconds to wait before recovery attempt. Defaults to 30.
+        """
         self.failure_threshold = failure_threshold
         self.recovery_timeout = recovery_timeout
         self.failure_count = 0
@@ -14,6 +28,14 @@ class CircuitBreaker:
         self.state = "CLOSED" # CLOSED, OPEN, HALF-OPEN
 
     def __call__(self, func):
+        """Decorator for wrapping a function with circuit breaker logic.
+
+        Args:
+            func: The function to wrap.
+
+        Returns:
+            The wrapped function.
+        """
         @wraps(func)
         def wrapper(*args, **kwargs):
             if self.state == "OPEN":

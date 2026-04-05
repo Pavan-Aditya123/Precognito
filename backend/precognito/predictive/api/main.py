@@ -31,6 +31,15 @@ latest_prediction = {
 }
 
 class TelemetryPayload(BaseModel):
+    """Schema for machine telemetry data.
+
+    Attributes:
+        machine_id: Unique identifier for the machine.
+        vibration_rms: Root Mean Square vibration value.
+        temperature: Operating temperature of the machine.
+        freq_spike_1x: Frequency spike at 1x rotational speed.
+        freq_spike_bpfo: Frequency spike at Ball Pass Frequency Outer race.
+    """
     machine_id: int
     vibration_rms: float
     temperature: float
@@ -39,6 +48,11 @@ class TelemetryPayload(BaseModel):
 
 @app.on_event("startup")
 def load_models():
+    """Load machine learning models during application startup.
+
+    If the model files exist, it initializes the PredictiveInferenceEngine.
+    Otherwise, it prints a warning message.
+    """
     global inference_engine
     if os.path.exists("models/rul_model.joblib"):
         inference_engine = PredictiveInferenceEngine(model_dir="models")
@@ -47,6 +61,17 @@ def load_models():
 
 @app.post("/predict/rul")
 def predict_rul(data: TelemetryPayload):
+    """Predict Remaining Useful Life (RUL) for a machine based on telemetry data.
+
+    Args:
+        data: A TelemetryPayload object containing machine telemetry values.
+
+    Returns:
+        A dictionary containing the status, machine_id, and the prediction results.
+
+    Raises:
+        HTTPException: If the inference engine models are not loaded.
+    """
     global inference_engine
     if not inference_engine:
         if os.path.exists("models/rul_model.joblib"):
@@ -81,6 +106,11 @@ def predict_rul(data: TelemetryPayload):
 
 @app.get("/api/predict")
 def get_predict():
+    """Retrieve the latest prediction result.
+
+    Returns:
+        A dictionary containing the latest prediction data.
+    """
     return latest_prediction
 
 # Mount frontend directory for static serving
@@ -90,6 +120,11 @@ app.mount("/static", StaticFiles(directory=frontend_path), name="static")
 
 @app.get("/")
 async def serve_frontend():
+    """Serve the frontend index.html file.
+
+    Returns:
+        A FileResponse if index.html exists, otherwise a message dictionary.
+    """
     index_file = os.path.join(frontend_path, "index.html")
     if os.path.exists(index_file):
         return FileResponse(index_file)

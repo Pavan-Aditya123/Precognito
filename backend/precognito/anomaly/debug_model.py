@@ -10,7 +10,12 @@ from sklearn.preprocessing import StandardScaler, LabelEncoder
 import json
 
 def debug_current_model():
-    """Debug what's wrong with current model"""
+    """Analyzes the current ML model and its components to identify issues.
+
+    Loads the saved Isolation Forest model, scaler, feature names, and label encoder.
+    Tests the model with extreme sensor values and prints the internal prediction
+    results, including anomaly scores and decision outcomes.
+    """
     print("Debugging Current Model Issues")
     print("=" * 50)
     
@@ -65,7 +70,13 @@ def debug_current_model():
         traceback.print_exc()
 
 def retrain_model_with_better_params():
-    """Retrain model with better parameters for anomaly detection"""
+    """Retrains the anomaly detection model with optimized hyperparameters.
+
+    Loads the predictive maintenance dataset, preprocesses features (encoding and scaling),
+    and trains a new Isolation Forest model with increased sensitivity (higher contamination).
+    Evaluates the model on test data and extreme cases, then saves the updated model,
+    scaler, and metadata to disk.
+    """
     print("\nRetraining Model with Better Parameters")
     print("=" * 50)
     
@@ -149,7 +160,12 @@ def retrain_model_with_better_params():
     print("\n✅ New model saved with better parameters!")
 
 def test_fixed_model():
-    """Test the fixed model"""
+    """Validates the updated anomaly detection model using core engine functions.
+
+    Tests both extreme and normal sensor telemetry cases through the unified
+    detect_anomaly interface to ensure the retrained model correctly classifies
+    anomalies with appropriate confidence levels and methods.
+    """
     print("\nTesting Fixed Model")
     print("=" * 30)
     

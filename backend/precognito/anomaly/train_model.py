@@ -13,7 +13,18 @@ import warnings
 warnings.filterwarnings('ignore')
 
 def load_and_preprocess_data():
-    """Load and preprocess the dataset"""
+    """Loads the predictive maintenance dataset and prepares features for training.
+
+    Reads 'predictive_maintenance.csv', extracts relevant sensor columns,
+    encodes the categorical 'Type' feature, and prepares the target labels.
+
+    Returns:
+        tuple: A tuple containing:
+            - X (pd.DataFrame): Preprocessed feature matrix.
+            - y (pd.Series): Target labels (0 for normal, 1 for anomaly).
+            - feature_names (list): List of feature names in the correct order.
+            - le (LabelEncoder): The fitted label encoder for categorical data.
+    """
     print("Loading dataset...")
     df = pd.read_csv('predictive_maintenance.csv')
     
@@ -45,7 +56,21 @@ def load_and_preprocess_data():
     return X, y, feature_names, le
 
 def train_isolation_forest(X, y):
-    """Train Isolation Forest model"""
+    """Trains an Isolation Forest model using the provided features and labels.
+
+    Splits the data into training and testing sets, scales the features,
+    calculates the contamination rate from the training data, and fits
+    an Isolation Forest model. Evaluates the model performance on the test set.
+
+    Args:
+        X (pd.DataFrame): Feature matrix.
+        y (pd.Series): Target labels.
+
+    Returns:
+        tuple: A tuple containing:
+            - iso_forest (IsolationForest): The trained Isolation Forest model.
+            - scaler (StandardScaler): The fitted standard scaler.
+    """
     print("Training Isolation Forest model...")
     
     # Split data
@@ -86,7 +111,14 @@ def train_isolation_forest(X, y):
     return iso_forest, scaler
 
 def save_model_and_metadata(model, scaler, feature_names, label_encoder):
-    """Save trained model and metadata"""
+    """Saves the trained model, scaler, and associated metadata to disk.
+
+    Args:
+        model (IsolationForest): The trained anomaly detection model.
+        scaler (StandardScaler): The fitted feature scaler.
+        feature_names (list): List of feature names used during training.
+        label_encoder (LabelEncoder): The fitted label encoder for categorical data.
+    """
     print("\nSaving model and metadata...")
     
     # Save model
@@ -119,7 +151,11 @@ def save_model_and_metadata(model, scaler, feature_names, label_encoder):
     print("Model and metadata saved successfully!")
 
 def test_model_on_sample_data():
-    """Test the trained model on sample data"""
+    """Tests the trained model and scaler on a set of predefined sample test cases.
+
+    Loads the saved model and metadata from disk, runs predictions on several
+    representative sensor telemetry samples, and prints the results.
+    """
     print("\nTesting model on sample data...")
     
     # Load model and scaler

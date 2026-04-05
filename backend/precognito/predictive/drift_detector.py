@@ -12,9 +12,15 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 def detect_drift():
-    """
-    Calculates Mean Absolute Error (MAE) for the predictive model.
-    Compares historical predictions with actual maintenance events from PostgreSQL.
+    """Calculates Mean Absolute Error (MAE) for the predictive model.
+
+    Compares historical predictions from InfluxDB with actual maintenance
+    completion events from the PostgreSQL audit logs to monitor model drift.
+    MAE is calculated based on the difference between predicted RUL and actual
+    time to failure/maintenance.
+
+    Returns:
+        None. Logs drift summary and warnings if thresholds are exceeded.
     """
     logger.info("Running Real Model Drift Detection...")
     

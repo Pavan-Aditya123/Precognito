@@ -49,9 +49,13 @@ export async function fetchWithAuth(endpoint: string, options: RequestInit = {})
  * Input interface for creating a new asset.
  */
 export interface CreateAssetInput {
+  /** The unique identifier of the asset. */
   assetId: string;
+  /** The human-readable name of the asset. */
   assetName: string;
+  /** Optional URL or path to the asset manual. */
   manual?: string;
+  /** Optional Mean Time To Repair benchmark. */
   mttr?: string;
 }
 
@@ -59,9 +63,13 @@ export interface CreateAssetInput {
  * Input interface for creating a new audit/work order.
  */
 export interface CreateAuditInput {
+  /** The unique identifier of the asset. */
   assetId: string;
+  /** The initial status for the work order. */
   status: string;
+  /** Optional remarks or notes. */
   remarks?: string;
+  /** Optional technician assigned to the task. */
   assignedTo?: string;
 }
 
@@ -69,9 +77,13 @@ export interface CreateAuditInput {
  * Input interface for completing a work order.
  */
 export interface CompleteWorkOrderInput {
+  /** Detailed description of the resolution. */
   resolution: string;
+  /** Optional ID of a spare part used. */
   partId?: number;
+  /** Quantity of the spare part used. */
   quantityUsed: number;
+  /** Total labor hours spent on the repair. */
   laborHours: number;
 }
 
@@ -79,9 +91,13 @@ export interface CompleteWorkOrderInput {
  * Backend response for device heartbeat data.
  */
 export interface HeartbeatResponse {
+  /** The unique device identifier. */
   deviceId: string;
+  /** ISO timestamp of the last seen heartbeat. */
   lastSeen: string;
+  /** Current operational status. */
   status: "Active" | "Inactive";
+  /** Seconds elapsed since the last heartbeat. */
   secondsSinceLast: number;
 }
 
@@ -194,8 +210,20 @@ export const api = {
    */
   reservePart: (data: { partId: number, workOrderId?: number, quantity: number }) => 
     fetchWithAuth("/inventory/reserve", { method: "POST", body: JSON.stringify(data) }),
+  /**
+   * Fetches maintenance recommendations.
+   *
+   * @param {string} [period="monthly"] The time period for recommendations.
+   * @param {string} [machineId] Optional machine ID to filter by.
+   * @returns {Promise<any>} Maintenance recommendations data.
+   */
   getRecommendations: (period: string = "monthly", machineId?: string) => 
     fetchWithAuth(`/admin-reporting/recommendations?period=${period}${machineId ? `&machine_id=${machineId}` : ""}`),
+  /**
+   * Fetches overall system health status.
+   *
+   * @returns {Promise<any>} System health data.
+   */
   getSystemHealth: () => fetchWithAuth("/admin-reporting/health"),
   /**
    * Fetches device heartbeats.

@@ -13,7 +13,7 @@ class PredictiveInferenceEngine:
         scaler: Loaded MinMaxScaler for feature normalization.
         rul_model: Loaded regression model for RUL estimation.
         fault_model: Loaded classifier for fault type identification.
-        initialized (bool): Whether models were successfully loaded.
+        initialized: Whether models were successfully loaded.
     """
 
     def __init__(self):
@@ -36,13 +36,16 @@ class PredictiveInferenceEngine:
         """Predicts RUL and fault type from telemetry data.
 
         Args:
-            telemetry_data (dict): Dictionary of sensor features (vibration_rms, 
-                                   temperature, freq_spike_1x, freq_spike_bpfo).
+            telemetry_data: Dictionary of sensor features (vibration_rms,
+                temperature, freq_spike_1x, freq_spike_bpfo).
 
         Returns:
-            dict: Prediction results including predicted_rul_hours, 
-                  predicted_fault_type, confidence_score_percent, 
-                  risk_level, and recommendation.
+            A dictionary containing prediction results including:
+                - predicted_rul_hours
+                - predicted_fault_type
+                - confidence_score_percent
+                - risk_level
+                - recommendation
         """
         if not self.initialized:
             return {
@@ -110,7 +113,7 @@ def get_predictive_engine():
     """Retrieves or initializes the global PredictiveInferenceEngine singleton.
 
     Returns:
-        PredictiveInferenceEngine: The singleton instance.
+        The PredictiveInferenceEngine singleton instance.
     """
     global _engine
     if _engine is None:
@@ -118,12 +121,12 @@ def get_predictive_engine():
     return _engine
 
 def predict_rul(data: dict) -> dict:
-    """Convenience wrapper for predicting RUL.
+    """Convenience wrapper for predicting machine health metrics.
 
     Args:
-        data (dict): Telemetry features.
+        data: Dictionary of machine telemetry features.
 
     Returns:
-        dict: Predictive results.
+        A dictionary containing the predictive results.
     """
     return get_predictive_engine().predict(data)

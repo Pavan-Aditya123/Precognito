@@ -4,20 +4,42 @@ import pandas as pd
 import numpy as np
 
 class PredictiveInferenceEngine:
+    """Engine for performing machine health predictive inference.
+
+    This engine leverages trained machine learning models and scalers to predict
+    the Remaining Useful Life (RUL) and identify potential fault types for machines
+    based on incoming telemetry data.
+    """
+
     def __init__(self, model_dir="models"):
+        """Initializes the engine by loading pre-trained models and scalers.
+
+        Args:
+            model_dir: Path to the directory containing 'scaler.joblib',
+                'rul_model.joblib', and 'fault_model.joblib'. Defaults to "models".
+        """
         # Load the saved models
         self.scaler = joblib.load(os.path.join(model_dir, "scaler.joblib"))
         self.rul_model = joblib.load(os.path.join(model_dir, "rul_model.joblib"))
         self.fault_model = joblib.load(os.path.join(model_dir, "fault_model.joblib"))
     
     def predict(self, telemetry_data: dict) -> dict:
-        """
-        Receives dictionary of telemetry features.
-        Returns prediction containing RUL, fault classification, and confidence.
-        TC_M3_01: Input valid telemetry, calculates and displays RUL.
-        TC_M3_03: Confidence percentage alongside prediction.
-        TC_M3_04: Identifies fault type (Bearing Wear, Misalignment).
-        TC_M3_05: Defines Planning Support/High Risk flag.
+        """Predicts machine health metrics from telemetry data.
+
+        Args:
+            telemetry_data: A dictionary containing machine telemetry features:
+                - vibration_rms
+                - temperature
+                - freq_spike_1x
+                - freq_spike_bpfo
+
+        Returns:
+            A dictionary containing the prediction results:
+                - predicted_rul_hours: Estimated RUL in hours.
+                - predicted_fault_type: Most likely fault type.
+                - confidence_score_percent: Confidence in the fault prediction.
+                - risk_level: Risk level (Normal, Warning, High-Risk).
+                - recommendation: Recommended maintenance action.
         """
         features = ["vibration_rms", "temperature", "freq_spike_1x", "freq_spike_bpfo"]
         

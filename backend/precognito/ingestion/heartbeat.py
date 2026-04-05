@@ -5,22 +5,22 @@ from datetime import datetime
 
 device_status = {}
 
-def update_heartbeat(device_id):
+def update_heartbeat(device_id: str):
     """Updates the last seen timestamp for a device.
 
     Args:
-        device_id (str): The unique identifier of the device.
+        device_id: The unique identifier of the device.
     """
     device_status[device_id] = datetime.now()
 
-def check_device_status(device_id):
+def check_device_status(device_id: str) -> str:
     """Checks the operational status of a device based on its heartbeat.
 
     Args:
-        device_id (str): The unique identifier of the device.
+        device_id: The unique identifier of the device.
 
     Returns:
-        str: The status of the device ("Active", "Sensor Not Transmitting", or "No Data").
+        The status of the device ("Active", "Sensor Not Transmitting", or "No Data").
     """
     last_seen = device_status.get(device_id)
 

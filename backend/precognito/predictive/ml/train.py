@@ -6,6 +6,19 @@ from sklearn.preprocessing import StandardScaler
 from joblib import dump
 
 def train_models():
+    """Trains machine health prediction models using synthetic telemetry data.
+
+    This function performs the following steps:
+    1. Loads the telemetry dataset.
+    2. Linearizes the RUL target variable.
+    3. Scales the feature data.
+    4. Trains an XGBoost regressor for RUL prediction.
+    5. Trains a Random Forest classifier for fault type classification.
+    6. Saves the models and scaler to the 'models/' directory.
+
+    Returns:
+        None.
+    """
     print("Loading data...")
     df = pd.read_csv("data/telemetry_dataset.csv")
 

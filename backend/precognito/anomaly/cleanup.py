@@ -35,7 +35,12 @@ REMOVE_FILES = {
 }
 
 def cleanup_files():
-    """Remove unnecessary files"""
+    """Removes redundant or complex files while preserving essential components.
+
+    Iterates through the current directory and unlinks files that are explicitly
+    listed in the REMOVE_FILES set. Essential files listed in KEEP_FILES are
+    preserved. Prints a summary of removed and kept files.
+    """
     current_dir = Path('.')
     
     print("Cleaning up anomaly detection files...")

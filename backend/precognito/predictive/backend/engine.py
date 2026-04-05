@@ -4,7 +4,19 @@ import pandas as pd
 import numpy as np
 
 class PredictiveInferenceEngine:
+    """Engine for performing predictive maintenance inference.
+
+    This engine loads trained models and scalers to predict Remaining Useful Life (RUL)
+    and fault types based on machine telemetry data.
+    """
+
     def __init__(self, model_dir="models"):
+        """Initializes the PredictiveInferenceEngine by loading models and scalers.
+
+        Args:
+            model_dir: Directory where the model and scaler files are located.
+                Defaults to "models".
+        """
         # Default to models directory relative to parent folder
         if not os.path.exists(model_dir):
             # Check for models folder in the parent directory
@@ -17,6 +29,20 @@ class PredictiveInferenceEngine:
         self.fault_model = joblib.load(os.path.join(model_dir, "fault_model.joblib"))
     
     def predict(self, telemetry_data: dict) -> dict:
+        """Predicts RUL and fault type from telemetry data.
+
+        Args:
+            telemetry_data: A dictionary containing machine telemetry values
+                (vibration_rms, temperature, freq_spike_1x, freq_spike_bpfo).
+
+        Returns:
+            A dictionary containing:
+                - predicted_rul_hours: Estimated RUL in hours.
+                - predicted_fault_type: Most likely fault type.
+                - confidence_score_percent: Confidence in the fault prediction.
+                - risk_level: Risk level (Normal, Warning, High-Risk).
+                - recommendation: Recommended maintenance action.
+        """
         features = ["vibration_rms", "temperature", "freq_spike_1x", "freq_spike_bpfo"]
         
         df_row = {f: telemetry_data.get(f, 0.0) for f in features}

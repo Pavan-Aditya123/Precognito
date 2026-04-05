@@ -40,7 +40,11 @@ if not DATABASE_URL:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Context manager for handling application startup and shutdown events."""
+    """Context manager for handling application startup and shutdown events.
+
+    Args:
+        app: The FastAPI application instance.
+    """
     # Startup: Initialize DB Pool
     app.db_pool = await asyncpg.create_pool(DATABASE_URL)
     yield
@@ -78,7 +82,17 @@ app.include_router(financial_router)
 
 @app.get("/health")
 async def health_check(pool = Depends(get_db_pool)):
-    """Health check endpoint for load balancers."""
+    """Health check endpoint for load balancers.
+
+    Args:
+        pool: Database connection pool dependency.
+
+    Returns:
+        dict: A dictionary containing the health status of various services.
+
+    Raises:
+        HTTPException: If any of the services are unhealthy.
+    """
     from precognito.ingestion.influx_client import client as influx_client
     
     health_status = {
@@ -118,7 +132,15 @@ async def health_check(pool = Depends(get_db_pool)):
     return health_status
 
 async def log_audit_action(pool, user_id: str, action: str, resource: str, details: str = None):
-    """Logs a user action to the audit log table with basic redaction."""
+    """Logs a user action to the audit log table with basic redaction.
+
+    Args:
+        pool: Database connection pool.
+        user_id: The ID of the user performing the action.
+        action: The action performed (e.g., 'SUBMIT_FEEDBACK').
+        resource: The resource affected by the action (e.g., 'anomaly:123').
+        details: Optional additional details about the action.
+    """
     if details:
         sensitive_keywords = ["password", "token", "secret", "key"]
         for kw in sensitive_keywords:
@@ -134,7 +156,19 @@ async def log_audit_action(pool, user_id: str, action: str, resource: str, detai
 
 @app.get("/audit-logs")
 async def get_audit_logs(limit: int = 100, offset: int = 0, user = admin_only, pool = Depends(get_db_pool)):
-    """API endpoint to retrieve recent audit logs. Restricted to admins. Supports pagination."""
+    """API endpoint to retrieve recent audit logs.
+
+    Restricted to admins. Supports pagination.
+
+    Args:
+        limit: Maximum number of logs to retrieve. Defaults to 100.
+        offset: Number of logs to skip. Defaults to 0.
+        user: The authenticated admin user.
+        pool: Database connection pool dependency.
+
+    Returns:
+        list: A list of audit log records.
+    """
     async with pool.acquire() as conn:
         rows = await conn.fetch(
             'SELECT * FROM "audit_log" ORDER BY "timestamp" DESC LIMIT $1 OFFSET $2',
@@ -144,7 +178,19 @@ async def get_audit_logs(limit: int = 100, offset: int = 0, user = admin_only, p
 
 @app.post("/analytics/feedback")
 async def submit_feedback(data: dict, user = authenticated_user, pool = Depends(get_db_pool)):
-    """Receives human feedback (True/False) for an anomaly prediction."""
+    """Receives human feedback (True/False) for an anomaly prediction.
+
+    Args:
+        data: A dictionary containing feedback details (anomalyId, deviceId, isReal).
+        user: The authenticated user submitting feedback.
+        pool: Database connection pool dependency.
+
+    Returns:
+        dict: A status message indicating success.
+
+    Raises:
+        HTTPException: If required fields are missing from the data.
+    """
     anomaly_id = data.get("anomalyId")
     device_id = data.get("deviceId")
     is_real = data.get("isReal")
@@ -163,7 +209,15 @@ async def submit_feedback(data: dict, user = authenticated_user, pool = Depends(
 
 @app.get("/analytics/metrics")
 async def get_model_metrics(user = lead_above, pool = Depends(get_db_pool)):
-    """Calculates ML model performance metrics based on user feedback and actual events."""
+    """Calculates ML model performance metrics based on user feedback and actual events.
+
+    Args:
+        user: The authenticated user (lead or above).
+        pool: Database connection pool dependency.
+
+    Returns:
+        dict: A dictionary containing precision, recall, F1 score, and other metrics.
+    """
     from precognito.ingestion.influx_client import get_total_telemetry_count
     from precognito.work_orders.database import SessionLocal
     from precognito.work_orders.models import Audit
@@ -213,7 +267,18 @@ async def get_model_metrics(user = lead_above, pool = Depends(get_db_pool)):
 
 @app.get("/assets")
 async def get_assets(limit: int = 100, offset: int = 0, user = authenticated_user):
-    """Retrieves all assets with their health status from InfluxDB using optimized queries."""
+    """Retrieves all assets with their health status from InfluxDB.
+
+    Uses optimized queries.
+
+    Args:
+        limit: Maximum number of assets to retrieve. Defaults to 100.
+        offset: Number of assets to skip. Defaults to 0.
+        user: The authenticated user.
+
+    Returns:
+        list: A list of assets with their current status and last update time.
+    """
     from precognito.ingestion.influx_client import INFLUX_BUCKET, INFLUX_ORG, query_api
     
     # Note: unique() or group() in Flux can be used for true pagination if device count is huge
@@ -254,7 +319,18 @@ async def get_assets(limit: int = 100, offset: int = 0, user = authenticated_use
 
 @app.get("/anomalies")
 async def get_anomalies(limit: int = 100, offset: int = 0, user = authenticated_user):
-    """Retrieves detected anomalies from InfluxDB. Supports pagination."""
+    """Retrieves detected anomalies from InfluxDB.
+
+    Supports pagination.
+
+    Args:
+        limit: Maximum number of anomalies to retrieve. Defaults to 100.
+        offset: Number of anomalies to skip. Defaults to 0.
+        user: The authenticated user.
+
+    Returns:
+        list: A list of detected anomalies.
+    """
     from precognito.ingestion.influx_client import INFLUX_BUCKET, INFLUX_ORG, query_api
     
     # Use limit and offset directly in Flux for better performance
@@ -279,7 +355,20 @@ async def get_anomalies(limit: int = 100, offset: int = 0, user = authenticated_
 @app.get("/safety-alerts")
 @limiter.limit("30/minute")
 async def get_safety_alerts(request: Request, limit: int = 100, offset: int = 0, range: str = "-24h", user = lead_above):
-    """Retrieves all safety alerts within a time range. Supports pagination."""
+    """Retrieves all safety alerts within a time range.
+
+    Supports pagination.
+
+    Args:
+        request: The FastAPI request object.
+        limit: Maximum number of alerts to retrieve. Defaults to 100.
+        offset: Number of alerts to skip. Defaults to 0.
+        range: The time range for alerts. Defaults to "-24h".
+        user: The authenticated user (lead or above).
+
+    Returns:
+        list: A list of safety alerts.
+    """
     from precognito.ingestion.influx_client import INFLUX_BUCKET, INFLUX_ORG, query_api
 
     query = f'from(bucket: "{INFLUX_BUCKET}") |> range(start: {range}) |> filter(fn: (r) => r["_measurement"] == "safety_alerts") |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value") |> sort(columns: ["_time"], desc: true) |> limit(n: {limit}, offset: {offset})'
@@ -306,7 +395,19 @@ async def get_safety_alerts(request: Request, limit: int = 100, offset: int = 0,
 @app.post("/ingest/dev")
 @limiter.limit("10/minute")
 async def ingest_data_dev(request: Request, data: dict, user = admin_only):
-    """Authenticated ingestion endpoint for development and testing."""
+    """Authenticated ingestion endpoint for development and testing.
+
+    Args:
+        request: The FastAPI request object.
+        data: A dictionary containing telemetry data.
+        user: The authenticated admin user.
+
+    Returns:
+        dict: The ingestion processing result.
+
+    Raises:
+        HTTPException: If device_id is missing or processing fails.
+    """
     from precognito.ingestion.core import process_ingestion
 
     device_id = data.get("device_id")
@@ -327,7 +428,19 @@ async def ingest_data_dev(request: Request, data: dict, user = admin_only):
 @app.get("/heartbeats")
 @limiter.limit("60/minute")
 async def get_heartbeats(request: Request, limit: int = 100, offset: int = 0, user = lead_above):
-    """Retrieves the last seen status for all devices from InfluxDB. Supports pagination."""
+    """Retrieves the last seen status for all devices from InfluxDB.
+
+    Supports pagination.
+
+    Args:
+        request: The FastAPI request object.
+        limit: Maximum number of heartbeats to retrieve. Defaults to 100.
+        offset: Number of heartbeats to skip. Defaults to 0.
+        user: The authenticated user (lead or above).
+
+    Returns:
+        list: A list of device heartbeat statuses.
+    """
     from precognito.ingestion.influx_client import INFLUX_BUCKET, INFLUX_ORG, query_api
     
     query = f'from(bucket: "{INFLUX_BUCKET}") |> range(start: -30d) |> filter(fn: (r) => r["_measurement"] == "machine_telemetry") |> last() |> limit(n: {limit}, offset: {offset})'

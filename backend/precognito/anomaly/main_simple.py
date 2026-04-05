@@ -30,6 +30,11 @@ app.include_router(router)
 
 @app.get("/")
 async def root():
+    """Root endpoint for the Anomaly Detection application.
+
+    Returns:
+        dict: A welcome message and link to the API documentation.
+    """
     return {"message": "Anomaly Detection API v2.0", "docs": "/docs"}
 
 if __name__ == "__main__":
