@@ -6,7 +6,16 @@ import time
 import json
 import requests
 import argparse
+import sys
+import os
 from datetime import datetime
+
+# Add the backend directory to sys.path to allow imports
+current_dir = os.path.dirname(os.path.abspath(__file__))
+backend_dir = os.path.abspath(os.path.join(current_dir, "..", ".."))
+if backend_dir not in sys.path:
+    sys.path.append(backend_dir)
+
 import paho.mqtt.client as mqtt
 import numpy as np
 from precognito.ingestion.dsp import process_raw_edge_data
