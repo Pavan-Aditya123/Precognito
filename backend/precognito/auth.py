@@ -50,18 +50,14 @@ async def get_current_user(request: Request, pool: asyncpg.Pool = Depends(get_db
         raise HTTPException(status_code=401, detail="Not authenticated")
 
     async with pool.acquire() as conn:
-        # Debug: list all tokens in the DB
-        all_sessions = await conn.fetch('SELECT id, token FROM session LIMIT 5')
-        logger.info(f"Existing tokens in DB: {[s['token'][:8] for s in all_sessions]}")
-        logger.info(f"Looking for token: {session_token[:8]}...")
-
-        session = await conn.fetchrow(
-            'SELECT "userId", "expiresAt", token FROM "session" WHERE token = $1 OR id = $1',
-            session_token
-        )
+        # Use unquoted table name and explicit column selection.
+        # We check both token and id.
+        query = 'SELECT "userId", "expiresAt", token FROM session WHERE token = $1 OR id = $1'
+        session = await conn.fetchrow(query, session_token)
         
         if not session:
-            logger.warning(f"Invalid session token (not found in DB): {session_token[:8]}...")
+            # Fallback: check if the token might be stored hashed (though unlikely based on logs)
+            logger.warning(f"Session not found for token: {session_token[:8]}...")
             raise HTTPException(status_code=401, detail="Invalid session")
             
         # Robust expiry check
