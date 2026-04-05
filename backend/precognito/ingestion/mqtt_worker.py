@@ -4,6 +4,14 @@ MQTT Worker module for ingesting telemetry data from an MQTT broker.
 import json
 import logging
 import os
+import sys
+
+# Add the backend directory to sys.path to allow imports
+current_dir = os.path.dirname(os.path.abspath(__file__))
+backend_dir = os.path.abspath(os.path.join(current_dir, "..", ".."))
+if backend_dir not in sys.path:
+    sys.path.append(backend_dir)
+
 import paho.mqtt.client as mqtt
 from dotenv import load_dotenv
 from precognito.ingestion.core import process_ingestion

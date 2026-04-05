@@ -333,20 +333,23 @@ async def get_assets(limit: int = 100, offset: int = 0, user = authenticated_use
         for record in table.records:
             d_id = record.values.get("device_id")
             risk = risk_map.get(d_id, "Normal")
-            
+
             status = "GREEN"
             if risk == "High-Risk":
                 status = "RED"
             elif risk == "Warning":
                 status = "YELLOW"
-                
+
             all_assets.append({
                 "id": d_id,
                 "name": d_id.replace("_", " ").title(),
                 "status": status,
-                "lastUpdate": record.get_time().isoformat()
+                "lastUpdated": record.get_time().isoformat(),
+                "type": record.values.get("type", "Machine"),
+                "location": "Plant Floor A",
+                "rms": float(record.values.get("vibration_rms", 0.0)),
+                "rul": float(record.values.get("vibration", 0.0)) / 20.0 # Placeholder calculation
             })
-            
     return all_assets[offset : offset + limit]
 
 @app.get("/anomalies")
@@ -373,13 +376,14 @@ async def get_anomalies(limit: int = 100, offset: int = 0, user = authenticated_
     
     for table in tables:
         for record in table.records:
+            d_id = record.values.get("device_id")
             results.append({
-                "id": f"{record.get_time().timestamp()}-{record.values.get('device_id')}",
-                "deviceId": record.values.get("device_id"),
-                "severity": record.values.get("severity"),
-                "message": record.values.get("reason"),
-                "timestamp": record.get_time().isoformat(),
-                "acknowledged": False
+                "id": f"{record.get_time().timestamp()}-{d_id}",
+                "assetId": d_id,
+                "assetName": d_id.replace("_", " ").title(),
+                "severity": record.values.get("severity", "LOW"),
+                "message": record.values.get("reason", "Anomaly detected"),
+                "timestamp": record.get_time().isoformat()
             })
 
     return results
