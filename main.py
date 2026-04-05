@@ -1,6 +1,12 @@
 import multiprocessing
 import uvicorn
 import logging
+import sys
+import os
+
+# Add the backend directory to sys.path
+sys.path.append(os.path.join(os.path.dirname(__file__), "backend"))
+
 from precognito.api import app
 from precognito.ingestion.mqtt_worker import run_worker
 
@@ -25,9 +31,12 @@ if __name__ == "__main__":
     mqtt_process.start()
 
     try:
+        # Keep the main process alive while the children are running
         api_process.join()
-        mqtt_process.start()
+        mqtt_process.join()
     except KeyboardInterrupt:
         logger.info("Stopping services...")
         api_process.terminate()
         mqtt_process.terminate()
+        api_process.join()
+        mqtt_process.join()
