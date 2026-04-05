@@ -83,6 +83,15 @@ app.include_router(workorder_router)
 app.include_router(inventory_router)
 app.include_router(financial_router)
 
+@app.get("/debug-auth")
+async def debug_auth(request: Request):
+    """Debug endpoint to check received cookies and headers."""
+    return {
+        "cookies": request.cookies,
+        "headers": {k: v for k, v in request.headers.items() if k.lower() in ["authorization", "cookie"]},
+        "remote_addr": request.client.host
+    }
+
 @app.get("/health")
 async def health_check(pool = Depends(get_db_pool)):
     """Health check endpoint for load balancers.

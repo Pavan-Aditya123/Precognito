@@ -50,8 +50,10 @@ async def get_current_user(request: Request, pool: asyncpg.Pool = Depends(get_db
         raise HTTPException(status_code=401, detail="Not authenticated")
 
     async with pool.acquire() as conn:
+        # Check both token and id columns as some versions of better-auth 
+        # use the ID in the cookie.
         session = await conn.fetchrow(
-            'SELECT "userId", "expiresAt", "token" FROM "session" WHERE "token" = $1',
+            'SELECT "userId", "expiresAt", "token" FROM "session" WHERE "token" = $1 OR "id" = $1',
             session_token
         )
         
@@ -59,12 +61,13 @@ async def get_current_user(request: Request, pool: asyncpg.Pool = Depends(get_db
             logger.warning(f"Invalid session token (not found in DB): {session_token[:8]}...")
             raise HTTPException(status_code=401, detail="Invalid session")
             
-        # Timing safe comparison (redundant here as DB already matched, but good practice)
-        if not secrets.compare_digest(session["token"], session_token):
-            raise HTTPException(status_code=401, detail="Invalid session")
-
-        # Check expiry (asyncpg returns datetime)
-        if session["expiresAt"].replace(tzinfo=timezone.utc) < datetime.now(timezone.utc):
+        # Robust expiry check
+        expires_at = session["expiresAt"]
+        if expires_at.tzinfo is None:
+            expires_at = expires_at.replace(tzinfo=timezone.utc)
+            
+        if expires_at < datetime.now(timezone.utc):
+            logger.warning(f"Session expired: {expires_at}")
             raise HTTPException(status_code=401, detail="Session expired")
             
         user = await conn.fetchrow(
